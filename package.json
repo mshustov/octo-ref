@@ -1,0 +1,19 @@
+{
+  "name": "octo-ref",
+  "version": "0.0.1",
+  "dependencies": {
+    "tern": "^0.13.0"
+  },
+  "devDependencies": {
+    "babel": "^5.0.0",
+    "babel-loader": "^5.0.0",
+    "tape": "^4.0.0",
+    "tap-difflet": "^0.4.0",
+    "webpack": "^1.12.0"
+  },
+  "scripts": {
+    "build": "./node_modules/webpack/bin/webpack.js",
+    "watch": "./node_modules/webpack/bin/webpack.js --watch",
+    "test": "node ./spec/index.js | tap-difflet"
+  }
+}
