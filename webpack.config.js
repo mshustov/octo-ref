@@ -30,13 +30,11 @@ module.exports = {
 
     ],
     module: {
-        loaders: [
-            {
-                test: /\.js$/,
-                exclude: /(node_modules)/,
-                loader: 'babel'
-            }
-        ]
+        loaders: [{
+            test: /\.js$/,
+            exclude: /(node_modules)/,
+            loader: 'babel'
+        }]
     },
     stats: {
         colors: true,

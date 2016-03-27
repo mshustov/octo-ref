@@ -9,6 +9,7 @@ var server = new tern.Server({
 chrome.extension.onMessage.addListener(function(request, sender, callback){
     switch(request.cmd){
         case 'register':
+            // try? cb(err, status)
             server.addFile(sender.url, request.data.content);
             callback('registered');
             break;
@@ -16,6 +17,7 @@ chrome.extension.onMessage.addListener(function(request, sender, callback){
         case 'definition':
         case 'refs':
             request.data.file = sender.url;
+            console.log('--------', request.data);
             server.request({query: request.data, files: []}, function(error, data) {
                 if (error) {
                     console.log('error while ' + request.cmd, error);
