@@ -4,8 +4,9 @@ var path = require('path');
 module.exports = {
     context: __dirname,
     entry: {
-        index: './src/index.js',
-        contentscript: './src/contentscript.js'
+        background: './src/background.js',
+        contentscript: './src/contentscript.js',
+        popup: './src/popup.js'
     },
     output: {
         path: path.join(__dirname, 'dist/js/'),

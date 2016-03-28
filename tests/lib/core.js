@@ -1,4 +1,4 @@
-var GitTern = require('../src/core');
+var GitTern = require('../../src/lib/core');
 
 describe('core', function(){
     it('constructor should create instance', function() {

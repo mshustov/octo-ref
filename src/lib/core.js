@@ -1,11 +1,11 @@
 const settings = {
     source: {
-        className: 'extension-source',
+        className: 'defColor',
         active: true,
         scroll: true
     },
     reference: {
-        className: 'extension-reference',
+        className: 'refColor',
         active: true,
         scroll: false
     }

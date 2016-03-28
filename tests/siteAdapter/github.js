@@ -1,4 +1,4 @@
-var Adapter = require('../src/siteAdapter/github');
+var Adapter = require('../../src/siteAdapter/github');
 var adapter;
 
 describe('github api', function(){

@@ -1,22 +1,24 @@
-var injection = require('github-injection'); // TODO refactor this
-var GitTern = require('./core.js');
+import injection from 'github-injection'; // TODO refactor this
+import GitTern from './lib/core.js';
+import updateStyle from './lib/update-style.js';
 
+updateStyle();
 // module.exports  = function(global, options, cb) {
   // var instance  = new GitTern(window, {
   //   type: 'github'
   // });
 
-var adaptersMap = {
+const adaptersMap = {
     'github.com': 'github',
     'gist.github.com': 'gist-github'
 };
 
-var type = adaptersMap[window.location.hostname];
+const type = adaptersMap[window.location.hostname];
 
 if (type) {
-    var Adapter = require('./siteAdapter/' + type);
+    const Adapter = require('./siteAdapter/' + type);
     injection(window, function() {
-        var instance  = new GitTern(window, Adapter);
+        new GitTern(window, Adapter);
     });
 }
 // };
