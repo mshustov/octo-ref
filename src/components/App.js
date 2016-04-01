@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { CompactPicker } from 'react-color';
+import Radiogroup from './radiogroup';
+import Radio from './radio';
 
 class App extends Component{
     constructor() {
@@ -8,11 +10,19 @@ class App extends Component{
           displayColorPicker: false,
           currentType: null,
           defColor: '#f17013',
-          refColor: '#ffeb24'
+          refColor: '#ffeb24',
+          data: {}
         };
         this.handleClick = this.handleClick.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleChange = this.handleChange.bind(this);
+    }
+
+    componentDidMount() {
+        // TODO change to sync?
+        // chrome.storage.local.get('gitTern', (data) => {
+        //     this.setState({data});
+        // });
     }
 
     handleClick(type) {
@@ -24,21 +34,12 @@ class App extends Component{
         this.setState({ displayColorPicker: false });
     }
 
-    handleChange(color) {
+    _handleChange(color) {
         var colorType = this.state.currentType + 'Color'; // CLUDGE!!!
         this.setState({ 
             [colorType]: '#' + color.hex,
             displayColorPicker: false
         });
-
-        const defaultSettings = {
-            color: {
-                refColor: '#ffee00',
-                defColor: '#e6c8ec'
-            },
-            control: 'alt',
-            scroll: false
-        };
 
         // TODO change to sync?
         chrome.storage.local.get('gitTern', function(data) {
@@ -48,25 +49,48 @@ class App extends Component{
         });
     }
 
+    handleChange(prop, value){
+        console.log(prop, value);
+    }
+
     render() {
         console.log(this.state);
         return (
-            <div>
-                //FIXME move to separate component
-                <div onClick={ this.handleClick.bind(null, 'def') }>
-                    Definition: {this.state.defColor}
-                </div>
-                <div onClick={ this.handleClick.bind(null, 'ref') }>
-                    Refs: {this.state.refColor}
+            <div className="container">
+                <div className="row">
+                    <div className="row row_column" onClick={ this.handleClick.bind(null, 'def') }>
+                        <div className="item title">Definition:</div>
+                        <div className="item pallet" style={{backgroundColor: this.state.defColor}}>
+                            {this.state.defColor}
+                        </div>
+                    </div>
+                    <div className="row row_column" onClick={ this.handleClick.bind(null, 'ref') }>
+                        <div className="item title">Refs:</div>
+                        <div className="item pallet" style={{backgroundColor: this.state.refColor}}>
+                            {this.state.refColor}
+                        </div>
+                    </div>
                 </div>
                 {this.state.displayColorPicker &&
                 <CompactPicker
                   color={ this.state.color }
                   position="below"
-                  onChange={ this.handleChange }
+                  onChange={(color)=> {this.handleClose(); this.handleChange(this.state.currentType, color.hex)}}
                   onClose={ this.handleClose }
                 />
                 }
+                <div>
+                    <div className="title">Click +</div>
+                    <Radiogroup classNames="row"
+                        name="typeClick"
+                        value="alt"
+                        options={['alt', 'shift', 'cmd']}
+                        onChange={(value)=> this.handleChange('clickType', value)}
+                    />
+                </div>
+                <Radio isActive={this.state.scroll} value="Scroll to Definition"
+                    onClick={()=>this.handleChange('scroll', !this.state.props)}
+                />
             </div>
         );
     }
