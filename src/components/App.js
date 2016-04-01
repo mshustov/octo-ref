@@ -9,8 +9,6 @@ class App extends Component{
         this.state = {
           displayColorPicker: false,
           currentType: null,
-          defColor: '#f17013',
-          refColor: '#ffeb24',
           data: {}
         };
         this.handleClick = this.handleClick.bind(this);
@@ -19,10 +17,10 @@ class App extends Component{
     }
 
     componentDidMount() {
-        // TODO change to sync?
-        // chrome.storage.local.get('gitTern', (data) => {
-        //     this.setState({data});
-        // });
+        // TODO change to sync? move to separate file
+        chrome.storage.local.get('gitTern', (data) => {
+            this.setState({data: data.gitTern});
+        });
     }
 
     handleClick(type) {
@@ -35,11 +33,7 @@ class App extends Component{
     }
 
     _handleChange(color) {
-        var colorType = this.state.currentType + 'Color'; // CLUDGE!!!
-        this.setState({ 
-            [colorType]: '#' + color.hex,
-            displayColorPicker: false
-        });
+        var colorType = this.state.currentType;
 
         // TODO change to sync?
         chrome.storage.local.get('gitTern', function(data) {
@@ -50,7 +44,10 @@ class App extends Component{
     }
 
     handleChange(prop, value){
-        console.log(prop, value);
+        console.log('1', prop, value);
+        var newValue = Object.assign({}, this.state.data, {[prop]: value});
+        console.log('2', newValue);
+        chrome.storage.local.set({gitTern: newValue}, ()=>this.setState({data: newValue}));
     }
 
     render() {
@@ -58,16 +55,16 @@ class App extends Component{
         return (
             <div className="container">
                 <div className="row">
-                    <div className="row row_column" onClick={ this.handleClick.bind(null, 'def') }>
+                    <div className="row row_column" onClick={ this.handleClick.bind(null, 'defColor') }>
                         <div className="item title">Definition:</div>
-                        <div className="item pallet" style={{backgroundColor: this.state.defColor}}>
-                            {this.state.defColor}
+                        <div className="item pallet" style={{backgroundColor: `#${this.state.data.defColor}`}}>
+                            {this.state.data.defColor}
                         </div>
                     </div>
-                    <div className="row row_column" onClick={ this.handleClick.bind(null, 'ref') }>
+                    <div className="row row_column" onClick={ this.handleClick.bind(null, 'refColor') }>
                         <div className="item title">Refs:</div>
-                        <div className="item pallet" style={{backgroundColor: this.state.refColor}}>
-                            {this.state.refColor}
+                        <div className="item pallet" style={{backgroundColor: `#${this.state.data.refColor}`}}>
+                            {this.state.data.refColor}
                         </div>
                     </div>
                 </div>
@@ -83,13 +80,13 @@ class App extends Component{
                     <div className="title">Click +</div>
                     <Radiogroup classNames="row"
                         name="typeClick"
-                        value="alt"
+                        value={this.state.data.control}
                         options={['alt', 'shift', 'cmd']}
-                        onChange={(value)=> this.handleChange('clickType', value)}
+                        onChange={(value)=> this.handleChange('control', value)}
                     />
                 </div>
                 <Radio isActive={this.state.scroll} value="Scroll to Definition"
-                    onClick={()=>this.handleChange('scroll', !this.state.props)}
+                    onClick={()=>this.handleChange('scroll', !this.state.data.scroll)}
                 />
             </div>
         );
