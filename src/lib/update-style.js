@@ -1,57 +1,25 @@
-export default function () {
-    var sheet = (function() {
-        var style = document.createElement('style');
+class Styler {
+    constructor(getTemplate){
+        const style = document.createElement('style');
         style.appendChild(document.createTextNode(''));
         document.head.appendChild(style);
-        return style.sheet;
-    })();
-
-    function createStyle(selector, color) {
-        return `.${selector}
-        {
-            border-radius: 3px;
-            background-color: #${color};
-        }`;
+        this.sheet = style.sheet;
+        this.getTemplate = getTemplate;
     }
 
-    function updateStyle(styles, deleteOld){
-        // TODO overlay styles
+    updateStyle(styles){
         Object.keys(styles).forEach((key, i)=> {
-            if (deleteOld) {
-                try{
-                    sheet.deleteRule(0);
-                } catch (e) {}
-            }
-            const style = createStyle(key, styles[key]);
-            sheet.insertRule(style, i);
+            const style = this.getTemplate(key, styles[key]);
+            this.sheet.insertRule(style, i);
         })
     }
 
-    const defaultSettings = {
-        refColor: 'ffee00',
-        defColor: 'e6c8ec',
-        control: 'alt',
-        scroll: false
-    };
-
-    chrome.storage.local.remove('gitTern');
-    // TODO should we change local --> sync?
-    chrome.storage.local.get('gitTern', function(data) {
-        if(!data.color) { // in case of empty {}
-            data = defaultSettings;
-            chrome.storage.local.set({gitTern: defaultSettings});
+    removeRules(){
+        let i = this.sheet.rules.length;
+        while(i){
+            this.sheet.deleteRule(--i);
         }
-        updateStyle(data.color);
-    });
-
-
-    chrome.storage.onChanged.addListener(function(changes, namespace) {
-        for (var key in changes) {
-            if (key === 'gitTern'){
-                debugger;
-                updateStyle(changes[key].newValue.color, true);
-            }
-        }
-    });
+    }
 }
-// }
+
+export default Styler;

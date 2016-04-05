@@ -5,25 +5,32 @@ import Radio from './radio';
 
 class App extends Component{
     constructor() {
-        super();
+        super(...arguments);
         this.state = {
           displayColorPicker: false,
           currentType: null,
           data: {}
         };
-        this.handleClick = this.handleClick.bind(this);
+        this.handleColorClick = this.handleColorClick.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
     componentDidMount() {
         // TODO change to sync? move to separate file
-        chrome.storage.local.get('gitTern', (data) => {
+        chrome.storage.sync.get('gitTern', (data) => {
             this.setState({data: data.gitTern});
         });
+
+        // this.setState({data: {
+        //     refColor: 'ffee00',
+        //     defColor: 'e6c8ec',
+        //     control: 'alt',
+        //     scroll: false
+        // }})
     }
 
-    handleClick(type) {
+    handleColorClick(type) {
         this.state.currentType = type;
         this.setState({ displayColorPicker: !this.state.displayColorPicker });
     }
@@ -32,41 +39,41 @@ class App extends Component{
         this.setState({ displayColorPicker: false });
     }
 
-    _handleChange(color) {
-        var colorType = this.state.currentType;
-
-        // TODO change to sync?
-        chrome.storage.local.get('gitTern', function(data) {
-            data.gitTern.color[colorType] = color.hex;
-            debugger;
-            chrome.storage.local.set({gitTern: data.gitTern});
-        });
-    }
-
     handleChange(prop, value){
-        console.log('1', prop, value);
         var newValue = Object.assign({}, this.state.data, {[prop]: value});
-        console.log('2', newValue);
-        chrome.storage.local.set({gitTern: newValue}, ()=>this.setState({data: newValue}));
+        chrome.storage.sync.set({gitTern: newValue}, ()=>this.setState({data: newValue}));
+        // this.setState({data: newValue})
     }
 
     render() {
-        console.log(this.state);
+        const {refColor, defColor, scroll, control} = this.state.data;
         return (
             <div className="container">
                 <div className="row">
-                    <div className="row row_column" onClick={ this.handleClick.bind(null, 'defColor') }>
-                        <div className="item title">Definition:</div>
-                        <div className="item pallet" style={{backgroundColor: `#${this.state.data.defColor}`}}>
-                            {this.state.data.defColor}
-                        </div>
-                    </div>
-                    <div className="row row_column" onClick={ this.handleClick.bind(null, 'refColor') }>
-                        <div className="item title">Refs:</div>
-                        <div className="item pallet" style={{backgroundColor: `#${this.state.data.refColor}`}}>
-                            {this.state.data.refColor}
-                        </div>
-                    </div>
+                    <Radiogroup
+                        name="typeClick"
+                        value={control}
+                        options={['alt', 'shift', 'cmd']}
+                        onChange={(value)=> this.handleChange('control', value)}
+                    />
+                    <span className="title">+ click</span>
+                </div>
+                <label className="row">
+                    <input
+                        type="checkbox"
+                        checked={scroll}
+                        onClick={()=>this.handleChange('scroll', !scroll)} />
+                    <span className="title">Scroll to definition</span>
+                </label>
+                <div className="row" onClick={ this.handleColorClick.bind(null, 'defColor') }>
+                    <span className="pallet" style={{backgroundColor: `#${defColor}`}} >
+                        Definition color
+                    </span>
+                </div>
+                <div className="row" onClick={ this.handleColorClick.bind(null, 'refColor') }>
+                    <span className="pallet" style={{backgroundColor: `#${refColor}`}} >
+                        Reference color
+                    </span>
                 </div>
                 {this.state.displayColorPicker &&
                 <CompactPicker
@@ -76,18 +83,6 @@ class App extends Component{
                   onClose={ this.handleClose }
                 />
                 }
-                <div>
-                    <div className="title">Click +</div>
-                    <Radiogroup classNames="row"
-                        name="typeClick"
-                        value={this.state.data.control}
-                        options={['alt', 'shift', 'cmd']}
-                        onChange={(value)=> this.handleChange('control', value)}
-                    />
-                </div>
-                <Radio isActive={this.state.scroll} value="Scroll to Definition"
-                    onClick={()=>this.handleChange('scroll', !this.state.data.scroll)}
-                />
             </div>
         );
     }
