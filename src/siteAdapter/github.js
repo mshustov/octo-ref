@@ -39,11 +39,11 @@ GihubDomAPI.prototype.getFilename = function(){
 }
 
 GihubDomAPI.prototype.subscribe = function(event, fn){
-    return this.getRoot().addEventListener(event, fn);
+    return this.window.addEventListener(event, fn);
 }
 
 GihubDomAPI.prototype.unsubscribe = function(event, fn){
-    return this.getRoot().removeEventListener(event, fn);
+    return this.window.removeEventListener(event, fn);
 }
 
 GihubDomAPI.prototype.clean = function(selectors){

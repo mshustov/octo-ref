@@ -53,7 +53,7 @@ class App extends Component{
                     <Radiogroup
                         name="typeClick"
                         value={control}
-                        options={['alt', 'shift', 'cmd']}
+                        options={['alt', 'cmd']}
                         onChange={(value)=> this.handleChange('control', value)}
                     />
                     <span className="title">+ click</span>

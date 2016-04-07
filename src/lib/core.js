@@ -1,26 +1,24 @@
-const settings = {
-    source: {
-        className: 'defColor',
-        active: true,
-        scroll: true
-    },
-    reference: {
-        className: 'refColor',
-        active: true,
-        scroll: false
-    }
-};
+const controlKey = {
+    cmd: 'metaKey',
+    alt: 'altKey'
+}
 
-function GitTern (root, Adapter){
+const ESC = 27;
+
+function GitTern (root, Adapter, config){
     this.findDefinition= this.findDefinition.bind(this);
     this.showDefinition = this.showDefinition.bind(this);
     this.showRefs = this.showRefs.bind(this);
+    this.clickHandler = this.clickHandler.bind(this);
+    this.keyupHandler = this.keyupHandler.bind(this);
     this.domAPI = new Adapter(root);
+    this.config = config;
     // TODO remove handlers
 
     if(this.domAPI.isCodePage()){
         this.addHandlers();
-        this.send('register',
+        this.send(
+            'register',
             { content: this.domAPI.getFileContent() },
             (err, status) => console.log(status)
         );
@@ -29,45 +27,55 @@ function GitTern (root, Adapter){
 
 // FIX ME  change handler name
 GitTern.prototype.addHandlers = function(type){
-    this.domAPI.subscribe('click', this.clickHandler.bind(this));
+    this.domAPI.subscribe('click', this.clickHandler);
+    this.domAPI.subscribe('keyup', this.keyupHandler);
 }
 
 GitTern.prototype.clickHandler = function(e){
-    if(e && e.altKey) {
+    var eventType = controlKey[this.config.settings.control];
+    if(e[eventType]) {
         this.findDefinition();
     }
 }
 
-GitTern.prototype.findDefinition = function(){
-    const classNames = Object.keys(settings).map((type) => settings[type].className);
+GitTern.prototype.keyupHandler = function(e){
+    if (e.keyCode === ESC) {
+        this.clean();
+    }
+}
+
+GitTern.prototype.clean = function(){
+    const classNames = Object.keys(this.config.className).map((type) => this.config.className[type]);
     this.domAPI.clean(classNames);
+}
+
+GitTern.prototype.findDefinition = function(){
+    this.clean();
     const elem = this.domAPI.getElem();
     const line = this.domAPI.getLineNumber(elem);
     const ch = this.domAPI.getEndColumnPosition(elem);
-    if (settings.source.active) {
-        this.send(
-            'definition',
-            {
-                type: 'definition',
-                end: {line, ch},
-                lineCharPositions: true,
-                variable: null
-            },
-            this.showDefinition
-        );
-    }
-    if (settings.reference.active) {
-        this.send(
-            'refs',
-            {
-                type: 'refs',
-                end: {line, ch},
-                lineCharPositions: true,
-                variable: null
-            },
-            this.showRefs
-        );
-    }
+
+    this.send(
+        'definition',
+        {
+            type: 'definition',
+            end: {line, ch},
+            lineCharPositions: true,
+            variable: null
+        },
+        this.showDefinition
+    );
+
+    this.send(
+        'refs',
+        {
+            type: 'refs',
+            end: {line, ch},
+            lineCharPositions: true,
+            variable: null
+        },
+        this.showRefs
+    );
 }
 
 GitTern.prototype.send = function(cmd, data, cb){
@@ -78,11 +86,10 @@ GitTern.prototype.send = function(cmd, data, cb){
 GitTern.prototype.showRefs = function(data){
     if (data && data.refs){
         const type = 'reference';
-        const {scroll, className} = settings[type];
+
         data.refs.forEach((ref) => {
             this.domAPI.show( ref, {
-                scroll,
-                className
+                className: this.config.className[type]
             });
         })
     }
@@ -91,10 +98,10 @@ GitTern.prototype.showRefs = function(data){
 GitTern.prototype.showDefinition = function(data){
     if (data && data.start && data.end){
         const type = 'source';
-        const {scroll, className} = settings[type];
+
         this.domAPI.show( data, {
-            scroll,
-            className
+            scroll: this.config.settings.scroll,
+            className: this.config.className[type]
         })
     }
 }

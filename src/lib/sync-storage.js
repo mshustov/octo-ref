@@ -2,13 +2,14 @@ import isEmptyObject from '../utils/is-empty-object';
 
 class Syncer{
     constructor(rule, defaultValue, cb){
-        chrome.storage.sync.remove(rule);
+        // chrome.storage.sync.remove(rule);
         chrome.storage.sync.get(rule, function(data) {
-            if(isEmptyObject(data)) {
+            const value = data[rule];
+            if(value) {
                 data = defaultValue;
-                chrome.storage.sync.set({[rule]: data});
+                chrome.storage.sync.set({[rule]: value});
             }
-            cb(data);
+            cb(value);
         });
 
         chrome.storage.onChanged.addListener(function(changes, namespace) {
