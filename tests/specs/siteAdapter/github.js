@@ -1,4 +1,4 @@
-var Adapter = require('../../src/siteAdapter/github');
+var Adapter = require('../../../src/siteAdapter/github');
 var adapter;
 
 describe('github api', function(){
@@ -18,6 +18,7 @@ describe('github api', function(){
     });
 
     it('#getFilename should resolve filename', function() {
+        debugger;
         var filename = adapter.getFilename();
         var fnBeginsAt = filename.lastIndexOf('/');
         assert.equal(filename.slice(fnBeginsAt), '/github-page.js');

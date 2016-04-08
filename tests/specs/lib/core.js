@@ -1,4 +1,5 @@
-var GitTern = require('../../src/lib/core');
+var GitTern = require('../../../src/lib/core');
+var config = require('../../../src/config');
 
 describe('core', function(){
     it('constructor should create instance', function() {
@@ -12,7 +13,7 @@ describe('core', function(){
         GitTern.prototype.send = spySend;
         const stub = sinon.stub().returns(Adapter)
         const root = {};
-        new GitTern(root, stub);
+        new GitTern(root, stub, config);
         expect(stub.calledWithNew).to.be.ok;
         expect(spySubscribe.calledWith('click')).to.be.ok;
         expect(spySend.calledWith('register', {content: 'fileContent'})).to.be.ok;
@@ -35,7 +36,7 @@ describe('core', function(){
 
         GitTern.prototype.send = spySend;
         const root = {};
-        var instance = new GitTern(root, mockAdapter);
+        var instance = new GitTern(root, mockAdapter, config);
         instance.findDefinition();
 
         expect(spyClean.calledOnce).to.be.ok;
@@ -61,7 +62,7 @@ describe('core', function(){
 
         GitTern.prototype.send = () => null;
         const root = {};
-        var instance = new GitTern(root, mockAdapter);
+        var instance = new GitTern(root, mockAdapter, config);
 
         const data = {refs: ['data1', 'data2']};
         instance.showRefs(data);
@@ -82,7 +83,7 @@ describe('core', function(){
 
         GitTern.prototype.send = () => null;
         const root = {};
-        var instance = new GitTern(root, mockAdapter);
+        var instance = new GitTern(root, mockAdapter, config);
 
         const data = {start: 'start', end: 'end'};
         instance.showDefinition(data);
@@ -106,9 +107,9 @@ describe('core', function(){
 
         GitTern.prototype.send = () => null;
         const root = {};
-        const instance = new GitTern(root, mockAdapter);
+        const instance = new GitTern(root, mockAdapter, config);
         const stub = sinon.stub(instance, 'findDefinition');
-        instance.clickHandler();
+        instance.clickHandler({});
         expect(stub.notCalled).to.be.ok;
 
         instance.clickHandler({});

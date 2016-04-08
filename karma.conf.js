@@ -4,11 +4,11 @@ module.exports = function(config) {
         browsers: ['Chrome'],
         frameworks: ['mocha', 'chai-sinon'],
         files: [
-            'tests/**/*.js',
+            'tests/specs/**/*.js',
             'tests/fixtures/*.html'
         ],
         preprocessors: {
-            'tests/**/*.js': ['webpack'],
+            'tests/specs/**/*.js': ['webpack'],
             'tests/fixtures/*.html': ['html2js']
         },
         webpack: {

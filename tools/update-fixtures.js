@@ -5,7 +5,7 @@ var request = require('request');
 var cheerio = require('cheerio');
 
 var url2file = {
-    'github-page': 'https://github.com/restrry/octo-ref/blob/master/test/fixtures/github-page.js'
+    'github-page': 'https://github.com/restrry/octo-ref/blob/master/tests/fixtures/github-page.js'
 }
 
 Object.keys(url2file).forEach(function(fn){
