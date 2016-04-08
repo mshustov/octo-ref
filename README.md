@@ -1,7 +1,7 @@
 TODO:
- - fix for gist
- - ESC - delete highlight
- - tests
- - settings (popup)
- - css
  - static types (?)
+ - more tests
+ - clean up code
+ - logo
+ - ci + greenkeeper
+
