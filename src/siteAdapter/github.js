@@ -13,9 +13,9 @@ function GihubDomAPI(window) {
     this.window = window;
     this.root = window.document.querySelector(`.${GITHUB.CONTAINER}`);
 
-    if(!this.isCodePage()) {
-        return;
-    }
+    // if(!this.isCodePage()) {
+    //     return;
+    // }
 
     this.fileContent = this.root.innerText;
     const permalinkContainer = window.document.querySelector(`.${GITHUB.FILENAME}`);

@@ -26,9 +26,14 @@ function GitTern (root, Adapter, config){
 }
 
 // FIX ME  change handler name
-GitTern.prototype.addHandlers = function(type){
+GitTern.prototype.addHandlers = function(){
     this.domAPI.subscribe('click', this.clickHandler);
     this.domAPI.subscribe('keyup', this.keyupHandler);
+}
+
+GitTern.prototype.removeHandlers = function(){
+    this.domAPI.unsubscribe('click', this.clickHandler);
+    this.domAPI.unsubscribe('keyup', this.keyupHandler);
 }
 
 GitTern.prototype.clickHandler = function(e){

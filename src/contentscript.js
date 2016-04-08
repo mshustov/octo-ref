@@ -13,7 +13,6 @@ const template = (selector, color) =>
 
 const styler = new Styler(template);
 
-var zz = config;
 new Syncer('gitTern', config.settings, (data)=>{
     if(!data){
         debugger;
@@ -25,22 +24,23 @@ new Syncer('gitTern', config.settings, (data)=>{
     styler.updateStyle({refColor, defColor});
 });
 
-// module.exports  = function(global, options, cb) {
-  // var instance  = new GitTern(window, {
-  //   type: 'github'
-  // });
-
 const adaptersMap = {
     'github.com': 'github',
     'gist.github.com': 'gist-github'
 };
 
 const type = adaptersMap[window.location.hostname];
+const validExt = ['js', 'jsx', 'es', 'es6'];
 
 if (type) {
     const Adapter = require('./siteAdapter/' + type);
+    let instance;
     injection(window, function() {
-        new GitTern(window, Adapter, config);
+        if (validExt.some((ext) => window.location.pathname.endsWith(`.${ext}`))){
+            if(instance){
+                instance.removeHandlers();
+            }
+            instance = new GitTern(window, Adapter, config);
+        }
     });
 }
-// };
