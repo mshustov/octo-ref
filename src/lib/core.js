@@ -3,12 +3,16 @@ const controlKey = {
     alt: 'altKey'
 }
 
+const tsKind2Type = {
+    'writtenReference': 'source',
+    'reference': 'reference'
+};
+
 const ESC = 27;
 
 function GitTern (root, Adapter, config){
     this.findDefinition= this.findDefinition.bind(this);
     this.showDefinition = this.showDefinition.bind(this);
-    this.showRefs = this.showRefs.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
     this.keyupHandler = this.keyupHandler.bind(this);
     this.domAPI = new Adapter(root);
@@ -17,11 +21,7 @@ function GitTern (root, Adapter, config){
 
     if(this.domAPI.isCodePage()){
         this.addHandlers();
-        this.send(
-            'register',
-            { content: this.domAPI.getFileContent() },
-            (err, status) => console.log(status)
-        );
+        this.send('register', { content: this.domAPI.getFileContent() }, (err, status) => console.log(status));
     }
 }
 
@@ -60,27 +60,7 @@ GitTern.prototype.findDefinition = function(){
     const line = this.domAPI.getLineNumber(elem);
     const ch = this.domAPI.getEndColumnPosition(elem);
 
-    this.send(
-        'definition',
-        {
-            type: 'definition',
-            end: {line, ch},
-            lineCharPositions: true,
-            variable: null
-        },
-        this.showDefinition
-    );
-
-    this.send(
-        'refs',
-        {
-            type: 'refs',
-            end: {line, ch},
-            lineCharPositions: true,
-            variable: null
-        },
-        this.showRefs
-    );
+    this.send('definition', {end: {line, ch}},this.showDefinition);
 }
 
 GitTern.prototype.send = function(cmd, data, cb){
@@ -88,25 +68,14 @@ GitTern.prototype.send = function(cmd, data, cb){
     chrome.extension.sendMessage({ cmd, data }, cb);
 }
 
-GitTern.prototype.showRefs = function(data){
-    if (data && data.refs){
-        const type = 'reference';
-
-        data.refs.forEach((ref) => {
-            this.domAPI.show( ref, {
+GitTern.prototype.showDefinition = function(data){
+    if (data && Array.isArray(data)){
+        data.forEach((highlight) => {
+            const type = tsKind2Type[highlight.kind];
+            this.domAPI.show( highlight, {
+                scroll: this.config.settings.scroll,
                 className: this.config.className[type]
             });
-        })
-    }
-}
-
-GitTern.prototype.showDefinition = function(data){
-    if (data && data.start && data.end){
-        const type = 'source';
-
-        this.domAPI.show( data, {
-            scroll: this.config.settings.scroll,
-            className: this.config.className[type]
         })
     }
 }

@@ -1,5 +1,5 @@
 TODO:
- - static types (?)
+ - use ts
  - more tests
  - clean up code
  - logo

@@ -1,17 +1,24 @@
-import isEmptyObject from '../utils/is-empty-object';
+const syncer = {
+    getData(rule, cb){
+        chrome.storage.sync.get(rule, cb);
+    },
 
-class Syncer{
-    constructor(rule, defaultValue, cb){
-        // chrome.storage.sync.remove(rule);
-        chrome.storage.sync.get(rule, function(data) {
-            const value = data[rule];
-            if(value) {
-                data = defaultValue;
-                chrome.storage.sync.set({[rule]: value});
+    setData(data, cb){
+        chrome.storage.sync.set(data, cb);
+    },
+
+    getDataSetDefault(rule, defaultValue, cb){
+        this.getData(rule, (data) => {
+            let value = data[rule];
+            if(!value) {
+                value = defaultValue;
+                this.setData({[rule]: value}, cb);
             }
             cb(value);
         });
+    },
 
+    subscribe(rule, cb) {
         chrome.storage.onChanged.addListener(function(changes, namespace) {
             for (var key in changes) {
                 if (key === rule){
@@ -22,4 +29,4 @@ class Syncer{
     }
 }
 
-export default Syncer;
+export default syncer;

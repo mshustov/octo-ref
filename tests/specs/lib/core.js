@@ -40,36 +40,7 @@ describe('core', function(){
         instance.findDefinition();
 
         expect(spyClean.calledOnce).to.be.ok;
-        expect(spySend.calledWith(
-            'definition',
-            {
-                type: 'definition',
-                end: {line, ch},
-                lineCharPositions: true,
-                variable: null
-            }
-        )).to.be.ok;
-    });
-
-    it('#showRefs', function() {
-        const spyShow = sinon.spy();
-        const mockAdapter = function () {
-            return {
-                isCodePage: () => false,
-                show: spyShow
-            };
-        }
-
-        GitTern.prototype.send = () => null;
-        const root = {};
-        var instance = new GitTern(root, mockAdapter, config);
-
-        const data = {refs: ['data1', 'data2']};
-        instance.showRefs(data);
-
-        expect(spyShow.calledTwice).to.be.ok;
-        expect(spyShow.calledWith(data.refs[0])).to.be.ok;
-        expect(spyShow.calledWith(data.refs[1])).to.be.ok;
+        expect(spySend.calledWith('definition', { end: {line, ch} })).to.be.ok;
     });
 
     it('#showDefinition ', function() {
@@ -86,7 +57,7 @@ describe('core', function(){
         var instance = new GitTern(root, mockAdapter, config);
 
         const data = {start: 'start', end: 'end'};
-        instance.showDefinition(data);
+        instance.showDefinition([data]);
 
         expect(spyShow.calledOnce).to.be.ok;
         expect(spyShow.calledWith(data)).to.be.ok;

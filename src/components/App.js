@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import { CompactPicker } from 'react-color';
 import Radiogroup from './radiogroup';
 import Radio from './radio';
+import syncer from '../lib/sync-storage'
 
 class App extends Component{
-    constructor() {
-        super(...arguments);
+    constructor(props, ctx) {
+        super(props, ctx);
         this.state = {
           displayColorPicker: false,
           currentType: null,
@@ -17,17 +18,7 @@ class App extends Component{
     }
 
     componentDidMount() {
-        // TODO change to sync? move to separate file
-        chrome.storage.sync.get('gitTern', (data) => {
-            this.setState({data: data.gitTern});
-        });
-
-        // this.setState({data: {
-        //     refColor: 'ffee00',
-        //     defColor: 'e6c8ec',
-        //     control: 'alt',
-        //     scroll: false
-        // }})
+        syncer.getData('gitTern', (data) => this.setState({data: data.gitTern}));
     }
 
     handleColorClick(type) {
@@ -41,8 +32,7 @@ class App extends Component{
 
     handleChange(prop, value){
         var newValue = Object.assign({}, this.state.data, {[prop]: value});
-        chrome.storage.sync.set({gitTern: newValue}, ()=>this.setState({data: newValue}));
-        // this.setState({data: newValue})
+        syncer.setData({gitTern: newValue}, () => this.setState({data: newValue}));
     }
 
     render() {

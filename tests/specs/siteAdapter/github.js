@@ -26,7 +26,7 @@ describe('github api', function(){
     it('#getLineNumber should return line number', function() {
         var elem = window.document.getElementById('LC9').querySelector('.pl-smi');
         var lineNumber = adapter.getLineNumber(elem);
-        assert.equal(lineNumber, 8);
+        assert.equal(lineNumber, 9);
     });
 
     it('#getElem should return the deepest selected element', function() {
@@ -71,20 +71,19 @@ describe('github api', function(){
 
     it('#show should add class name (wrap text node)', function() {
         var refs = {
-            start: {ch: 4, line:0}, // hello
-            end: {ch: 9, line: 0}
+            start: {character: 4, line: 1}, // hello
+            length: 5
         };
         var options = {className: 'test-classname1'};
 
         adapter.show(refs, options);
-        var elem = window.document.getElementById('LC1').querySelector('.pl-c1');
         // should we use xpath?
         var selectedElem = window.document.querySelector('.test-classname1');
         assert.equal(selectedElem.innerText, 'hello', 'wrap textNode');
 
         refs = {
-            start: {ch: 8, line: 16}, // greet
-            end: {ch: 13, line: 16}
+            start: {character: 8, line: 17}, // greet
+            length: 5
         }
         options = {className: 'test-classname2'};
         adapter.show(refs, options);
@@ -94,8 +93,8 @@ describe('github api', function(){
 
     it('#clean should remove all class names', function() {
         var refs = {
-            start: {ch: 4, line:0}, // hello
-            end: {ch: 9, line: 0}
+            start: {character: 4, line: 1}, // hello
+            length: 5
         };
         var options = {className: 'test-classname1'};
         adapter.show(refs, options);

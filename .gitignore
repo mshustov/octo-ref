@@ -1,2 +1,3 @@
 dist/
 links/
+tests/fixtures/*.html

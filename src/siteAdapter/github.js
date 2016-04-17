@@ -13,10 +13,6 @@ function GihubDomAPI(window) {
     this.window = window;
     this.root = window.document.querySelector(`.${GITHUB.CONTAINER}`);
 
-    // if(!this.isCodePage()) {
-    //     return;
-    // }
-
     this.fileContent = this.root.innerText;
     const permalinkContainer = window.document.querySelector(`.${GITHUB.FILENAME}`);
     this.fileName = permalinkContainer.getAttribute('href');
@@ -72,7 +68,7 @@ GihubDomAPI.prototype.getElem = function(){
 GihubDomAPI.prototype.getLineNumber = function(elem){
     while(elem = elem.parentNode){
         if(elem.classList && elem.classList.contains(GITHUB.LINE)) {
-            return parseInt(elem.getAttribute('id').replace(/^\w./,''), 10) - 1;
+            return parseInt(elem.getAttribute('id').replace(/^\w./,''), 10);
         }
     }
     return null;
@@ -90,7 +86,6 @@ GihubDomAPI.prototype.getEndColumnPosition = function(elem){
 
     var selection = this.window.getSelection();
     // selection.modify('move', 'forward', 'word');
-    // debugger;
     let pos = selection ? selection.focusOffset : 0;
 
     // count horizontal offset
@@ -102,13 +97,11 @@ GihubDomAPI.prototype.getEndColumnPosition = function(elem){
 }
 
 GihubDomAPI.prototype.show = function(data, options){
-    // skip highlight in case of block
-    if (data.start.line !== data.end.line ){
+    if (!data) {
         return;
     }
-
     const {scroll, className} = options;
-    const line = data.start.line + 1;
+    const line = data.start.line;
     const root = this.window.document.getElementById(`${GITHUB.LINESHORT}${line}`);
     let elem;
     let offset = 0;
@@ -118,7 +111,7 @@ GihubDomAPI.prototype.show = function(data, options){
         elem = elem ? elem.nextSibling : root.firstChild;
         lastElemOffset = this.getElemLength(elem);
         offset += lastElemOffset;
-    } while (offset <= data.start.ch)
+    } while (offset <= data.start.character)
 
     offset -= lastElemOffset;
 
@@ -128,22 +121,19 @@ GihubDomAPI.prototype.show = function(data, options){
             // proboably when it does, we should switch to selectNode
             // rng = document.createRange(); rng.selectRange(elem);
             elem.classList.add(className);
-            if (scroll){
-                elem.scrollIntoViewIfNeeded();
-            }
             break;
 
         case TEXT_NODE:
             const rng = this.window.document.createRange();
-            rng.setStart(elem, data.start.ch - offset);
-            rng.setEnd(elem, data.end.ch - offset);
+            rng.setStart(elem, data.start.character - offset);
+            rng.setEnd(elem, data.start.character + data.length - offset);
             const highlightWrapper = this.window.document.createElement('span');
             highlightWrapper.classList.add(GITHUB.WRAPPER, className);
             rng.surroundContents(highlightWrapper);
-            if (scroll){
-                highlightWrapper.scrollIntoViewIfNeeded();
-            }
             break;
+    }
+    if (scroll){
+        elem.scrollIntoViewIfNeeded();
     }
 }
 

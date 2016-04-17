@@ -8,5 +8,6 @@ module.exports  = {
     className: {
         source: 'defColor',
         reference: 'refColor'
-    }
+    },
+    ext: ['.ts', '.js', '.jsx', /*'.es', */, '.es6']
 };

@@ -1,29 +1,22 @@
-var tern = require('tern');
+import Server from './lib/server';
+const server = new Server();
+// cache is cleared on every browser restart due to manifest settings
+const tabIdToUrl = {};
 
-var server = new tern.Server({
-    async: true,
-    defs: [],
-    plugins: {}
-});
-
-chrome.extension.onMessage.addListener(function(request, sender, callback){
+chrome.extension.onMessage.addListener((request, sender, callback) => {
     switch(request.cmd){
         case 'register':
-            // try? cb(err, status)
-            server.addFile(sender.url, request.data.content);
+            var filename = sender.url;
+            server.addFile(filename, request.data.content);
+            // we don't want to request 'tab' permissions
+            tabIdToUrl[sender.tab.id] = filename;
             callback('registered');
             break;
 
         case 'definition':
-        case 'refs':
-            request.data.file = sender.url;
-            console.log('--------', request.data);
-            server.request({query: request.data, files: []}, function(error, data) {
-                if (error) {
-                    console.log('error while ' + request.cmd, error);
-                }
-                callback(data);
-            });
+            var filename = sender.url;
+            var result = server.getDefinition(filename, request.data.end.line, request.data.end.ch);
+            callback(result);
             break;
 
         default:
@@ -31,15 +24,8 @@ chrome.extension.onMessage.addListener(function(request, sender, callback){
     }
 });
 
-//chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-//    console.log(sender.tab ?
-//    "from a content script:" + sender.tab.url :
-//        "from the extension");
-//    sendResponse({farewell: "goodbye"});
-//    debugger;
-    //chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    //    chrome.tabs.sendMessage(tabs[0].id, {greeting: "hello"}, function(response) {
-    //        console.log(response.farewell);
-    //    });
-    //});
-//});
+chrome.tabs.onRemoved.addListener(function(tabId){
+    var filename = tabIdToUrl[tabId];
+    server.removeFile(filename);
+    delete tabIdToUrl[tabId];
+})
