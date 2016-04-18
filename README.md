@@ -17,7 +17,7 @@ First version works for source pages on github site only.
 - definition / reference highlight color
 
 ### Install
-right now only from github)
+drag'n'drop built file from /build folder to `chrome://extensions/`
 
 ### License
 [WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-strip.jpg)

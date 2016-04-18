@@ -1,4 +1,3 @@
-var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
@@ -17,19 +16,6 @@ module.exports = {
         aggregateTimeout: 100
     },
     devtool: 'inline-source-map',
-    plugins: [
-        new webpack.ProvidePlugin({
-            acorn: 'acorn'
-        })
-        //new webpack.optimize.CommonsChunkPlugin(/* chunkName= */"vendor", /* filename= */"vendor.bundle.js"),
-        //new webpack.DefinePlugin({
-        //    REGISTATOR_NAME: JSON.stringify(config.registratorName)
-        //})
-        //new webpack.SourceMapDevToolPlugin({
-        //    exclude: 'browser-source-register'
-        //})
-
-    ],
     module: {
         loaders: [{
             test: /\.js$/,
