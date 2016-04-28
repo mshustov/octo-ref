@@ -1,9 +1,10 @@
 import Server from './lib/server';
-const server = new Server();
+const server = new Server({});
 // cache is cleared on every browser restart due to manifest settings
 const tabIdToUrl = {};
 
-chrome.extension.onMessage.addListener((request, sender, callback) => {
+// extension
+chrome.runtime.onMessage.addListener((request, sender, callback) => {
     switch(request.cmd){
         case 'register':
             var filename = sender.url;

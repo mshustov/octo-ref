@@ -1,5 +1,12 @@
-var Adapter = require('../../../src/siteAdapter/github');
+/// <reference path="../../../typings/main.d.ts" />
+/// <reference path="../../../typings/specs.d.ts" />
+import Adapter from '../../../src/adapter/github.js';
+
 var adapter;
+
+import chai = require('chai');
+const expect = chai.expect;
+const assert = chai.assert;
 
 describe('github api', function(){
     beforeEach(function() {
@@ -58,7 +65,7 @@ describe('github api', function(){
 
     it('#subscribe/#unsubscribe should subscibe/unsubscribe on event ', function() {
         var callback = sinon.spy();
-        var elem = window.document.getElementById('LC17').querySelector('.pl-c1');
+        var elem = window.document.getElementById('LC17').querySelector('.pl-c1') as HTMLElement;
 
         adapter.subscribe('click', callback);
         elem.click();
@@ -78,7 +85,7 @@ describe('github api', function(){
 
         adapter.show(refs, options);
         // should we use xpath?
-        var selectedElem = window.document.querySelector('.test-classname1');
+        var selectedElem = window.document.querySelector('.test-classname1') as HTMLElement;
         assert.equal(selectedElem.innerText, 'hello', 'wrap textNode');
 
         refs = {
@@ -87,7 +94,7 @@ describe('github api', function(){
         }
         options = {className: 'test-classname2'};
         adapter.show(refs, options);
-        var selectedElem = window.document.querySelector('.test-classname2');
+        var selectedElem = window.document.querySelector('.test-classname2') as HTMLElement;
         assert.equal(selectedElem.innerText, 'greet', 'add className to element node');
     });
 

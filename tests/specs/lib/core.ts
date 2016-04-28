@@ -1,5 +1,8 @@
-var GitTern = require('../../../src/lib/core');
-var config = require('../../../src/config');
+import GitTern from '../../../src/lib/core';
+const config = require('../../../src/config.json');
+
+import chai = require('chai');
+const expect = chai.expect;
 
 describe('core', function(){
     it('constructor should create instance', function() {

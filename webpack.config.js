@@ -1,15 +1,19 @@
 var path = require('path');
 
 module.exports = {
+    target: 'node',
     context: __dirname,
     entry: {
-        background: './src/background.js',
-        contentscript: './src/contentscript.js',
-        popup: './src/popup.js'
+        background: './src/background.ts',
+        contentscript: './src/contentscript.ts',
+        popup: './src/popup.tsx'
     },
     output: {
         path: path.join(__dirname, 'dist/js/'),
         filename: '[name].js'
+    },
+    resolve: {
+        extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js']
     },
     watch: true,
     watchOptions: {
@@ -18,10 +22,14 @@ module.exports = {
     devtool: 'inline-source-map',
     module: {
         loaders: [{
-            test: /\.js$/,
+            test: /\.json$/,
+            loader: 'json'
+        }, {
+            test: /\.(tsx?|js)$/,
             exclude: /(node_modules)/,
-            loader: 'babel'
-        }]
+            loader: 'ts-loader'
+        }],
+        noParse: [/typescript/]
     },
     stats: {
         colors: true,

@@ -1,8 +1,11 @@
-import injection from 'github-injection'; // TODO refactor this
+import * as injection from 'github-injection';
 import GitTern from './lib/core.js';
 import Styler from './lib/update-style';
 import syncer from './lib/sync-storage';
-import config from './config';
+import Adapter from './adapter/github.js';
+
+const config = require('./config.json');
+
 
 const template = (selector, color) =>
     `.${selector}
@@ -33,18 +36,20 @@ const adaptersMap = {
 };
 
 const type = adaptersMap[window.location.hostname];
-const isValidExtension = (str = '') => config.ext.some((ext) => str.endsWith(ext));
+const isValidExtension = (str = '') => config.ext.some((ext) => {
+    // endsWith
+    var index = str.lastIndexOf('.');
+    return str.slice(index) === ext;
+});
 
-if (type) {
-    const Adapter = require('./siteAdapter/' + type);
-    let instance;
-    injection(window, function() {
-        const url = window.location.pathname;
-        if (isValidExtension(url)){
-            if(instance){
-                instance.removeHandlers();
-            }
-            instance = new GitTern(window, Adapter, config);
+let instance;
+injection(window, function() {
+    const url = window.location.pathname;
+    if (isValidExtension(url)){
+        if(instance){
+            instance.removeHandlers();
         }
-    });
-}
+        instance = new GitTern(window, Adapter, config);
+    }
+});
+

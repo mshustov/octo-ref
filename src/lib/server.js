@@ -1,5 +1,5 @@
 // right now it's going to work only for a file
-import ts from 'typescript';
+import * as ts from 'typescript';
 import VFS from './vfs.js';
 
 class Server{

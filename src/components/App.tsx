@@ -1,10 +1,13 @@
-import React, { Component } from 'react';
+/// <reference path="../../typings/_custom.d.ts" />
+
+import * as React from 'react';
 import { CompactPicker } from 'react-color';
 import Radiogroup from './radiogroup';
 import Radio from './radio';
 import syncer from '../lib/sync-storage'
+import * as objectAssign from 'object-assign';
 
-class App extends Component{
+class App extends React.Component<any, any> {
     constructor(props, ctx) {
         super(props, ctx);
         this.state = {
@@ -31,7 +34,7 @@ class App extends Component{
     }
 
     handleChange(prop, value){
-        var newValue = Object.assign({}, this.state.data, {[prop]: value});
+        var newValue = objectAssign({}, this.state.data, { [prop]: value });
         syncer.setData({gitTern: newValue}, () => this.setState({data: newValue}));
     }
 

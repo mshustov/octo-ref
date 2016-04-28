@@ -1,23 +1,22 @@
+var webpackConfig = require('./webpack.config');
+
 module.exports = function(config) {
     config.set({
         basePath: '',
         browsers: ['Chrome'],
         frameworks: ['mocha', 'chai-sinon'],
         files: [
-            'tests/specs/**/*.js',
+            'tests/specs/**/*.ts',
             'tests/fixtures/*.html'
         ],
         preprocessors: {
-            'tests/specs/**/*.js': ['webpack'],
+            'tests/specs/**/*.ts': ['webpack'],
             'tests/fixtures/*.html': ['html2js']
         },
         webpack: {
             devtool: 'inline-source-map',
-            loaders: [{
-                test: /\.js$/,
-                exclude: /(node_modules)/,
-                loader: 'babel'
-            }]
+            module: webpackConfig.module,
+            resolve: webpackConfig.resolve
         },
         exclude: [],
         reporters: ['mocha'],
