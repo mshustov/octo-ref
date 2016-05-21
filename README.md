@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/restrry/octo-ref.svg?branch=master)](https://travis-ci.org/restrry/octo-ref)
+
 ### Overview
 Highlight definition and refrences on variable right on github pages!
 

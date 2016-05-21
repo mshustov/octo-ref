@@ -3,7 +3,7 @@ var webpackConfig = require('./webpack.config');
 module.exports = function(config) {
     config.set({
         basePath: '',
-        browsers: ['Chrome'],
+        browsers:   process.env.TRAVIS ? ['Chrome_travis_ci'] : ['Chrome'],
         frameworks: ['mocha', 'chai-sinon'],
         files: [
             'tests/specs/**/*.ts',
@@ -24,6 +24,13 @@ module.exports = function(config) {
         port: 9876,
         colors: true,
         autoWatch: true,
-        singleRun: true // true for CI / false for run in browser
+        singleRun: true, // true for CI / false for run in browser
+
+        customLaunchers: {
+            Chrome_travis_ci: {
+                base: 'Chrome',
+                flags: ['--no-sandbox']
+            }
+        }
     });
 };

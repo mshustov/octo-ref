@@ -58,7 +58,7 @@ class GihubDomAPI implements GihubDomAPI {
         // we need intersection of many
         const elems = this.window.document.querySelectorAll(selectorClasses);
         toArray(elems).forEach((elem) => {
-            elem.classList.remove(...selectors); // borrowed?
+            elem.classList.remove(...selectors);
             if (elem.classList.contains(GITHUB.WRAPPER)){
                 elem.parentNode.replaceChild(elem.firstChild, elem);
             }
