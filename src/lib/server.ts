@@ -1,14 +1,18 @@
 // right now it's going to work only for a file
 import * as ts from 'typescript';
-import VFS from './vfs.js';
+import * as objectAssign from 'object-assign';
+
+import VFS from './vfs.ts';
 
 class Server{
-    constructor(options) {
+    vfs: VFS
+    ls: ts.LanguageService
+    linkCounter: { [key: string]: number }
+    constructor() {
         this.vfs = new VFS();
-        var lsHost = {
-            // getCompilationSettings : function(){ return Object.assign(ts.getDefaultCompilerOptions(), { noResolve: true }) },
+        const lsHost: ts.LanguageServiceHost = {
             getCompilationSettings : () => {
-                return Object.assign(ts.getDefaultCompilerOptions(), {
+                return objectAssign(ts.getDefaultCompilerOptions(), {
                     noResolve: true,
                     allowNonTsExtensions: true,
                     allowJs: true
@@ -16,11 +20,12 @@ class Server{
             },
             getScriptFileNames : () => this.vfs.getFileNames(),
             getScriptSnapshot: (filename) => {
-                var content = this.vfs.getFile(filename);
-                return content ? ts.ScriptSnapshot.fromString(content) : '';
+                const content = this.vfs.getFile(filename);
+                return content
+                    ? ts.ScriptSnapshot.fromString(content) as ts.IScriptSnapshot
+                    : null;
             },
             getScriptVersion: () => '1',
-            getScriptIsOpen: () => false,
             getCurrentDirectory: () => '',
             getDefaultLibFileName : () => ts.getDefaultLibFileName(ts.getDefaultCompilerOptions())
         }
@@ -42,9 +47,9 @@ class Server{
 
     getDefinition(filename, line, col){
         // line, col --> pos on github level
-        var pos = ts.getPositionOfLineAndCharacter(this.ls.getSourceFile(filename), line - 1, col - 1);
-        var highlights = this.ls.getDocumentHighlights(filename, pos, [filename]);
-        var result = highlights ? 
+        const pos = ts.getPositionOfLineAndCharacter(this.ls.getSourceFile(filename), line - 1, col - 1);
+        const highlights = this.ls.getDocumentHighlights(filename, pos, [filename]);
+        const result = highlights ? 
             highlights[0].highlightSpans.map(({kind, textSpan}) => {
                 const {line, character} = ts.getLineAndCharacterOfPosition(this.ls.getSourceFile(filename), textSpan.start);
                 return {

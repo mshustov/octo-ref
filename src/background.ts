@@ -1,13 +1,13 @@
 import Server from './lib/server';
-const server = new Server({});
+const server = new Server();
 // cache is cleared on every browser restart due to manifest settings
 const tabIdToUrl = {};
 
 // extension
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
+    const filename = sender.url;
     switch(request.cmd){
         case 'register':
-            var filename = sender.url;
             server.addFile(filename, request.data.content);
             // we don't want to request 'tab' permissions
             tabIdToUrl[sender.tab.id] = filename;
@@ -15,8 +15,8 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
             break;
 
         case 'definition':
-            var filename = sender.url;
-            var result = server.getDefinition(filename, request.data.end.line, request.data.end.ch);
+            const {line, character} = request.data.end;
+            const result = server.getDefinition(filename, line, character);
             callback(result);
             break;
 
@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
 });
 
 chrome.tabs.onRemoved.addListener(function(tabId){
-    var filename = tabIdToUrl[tabId];
+    const filename = tabIdToUrl[tabId];
     server.removeFile(filename);
     delete tabIdToUrl[tabId];
 })

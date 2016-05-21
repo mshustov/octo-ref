@@ -1,17 +1,17 @@
 import * as injection from 'github-injection';
-import GitTern from './lib/core.js';
+import OctoRef from './lib/core.js';
 import Styler from './lib/update-style';
 import syncer from './lib/sync-storage';
-import Adapter from './adapter/github.js';
+import Adapter from './adapter/github';
+import { endsWith } from './lib/utils.ts';
 
 const config = require('./config.json');
-
 
 const template = (selector, color) =>
     `.${selector}
     {
-        border-radius: 3px;
-        background-color: #${color};
+        borderf-radius: 3px;
+        background-color: ${color};
     }`
 
 const styler = new Styler(template);
@@ -27,8 +27,8 @@ const callback = (data) => {
     styler.updateStyle({refColor, defColor});
 }
 
-syncer.getDataSetDefault('gitTern', config.settings, callback);
-syncer.subscribe('gitTern', callback)
+syncer.getDataSetDefault('octoRef', config.settings, callback);
+syncer.subscribe('octoRef', callback)
 
 const adaptersMap = {
     'github.com': 'github'
@@ -36,11 +36,7 @@ const adaptersMap = {
 };
 
 const type = adaptersMap[window.location.hostname];
-const isValidExtension = (str = '') => config.ext.some((ext) => {
-    // endsWith
-    var index = str.lastIndexOf('.');
-    return str.slice(index) === ext;
-});
+const isValidExtension = (str = '') => config.ext.some(endsWith.bind(null, str));
 
 let instance;
 injection(window, function() {
@@ -49,7 +45,7 @@ injection(window, function() {
         if(instance){
             instance.removeHandlers();
         }
-        instance = new GitTern(window, Adapter, config);
+        instance = new OctoRef(window, Adapter, config);
     }
 });
 

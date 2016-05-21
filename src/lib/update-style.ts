@@ -1,9 +1,13 @@
-class Styler {
+///<reference path="../../typings/vendors.d.ts"/>
+
+class Styler implements Styler {
+    sheet: CSSStyleSheet
+    getTemplate: GetTemplate
     constructor(getTemplate){
-        const style = document.createElement('style');
+        const style = document.createElement('style') as HTMLStyleElement;
         style.appendChild(document.createTextNode(''));
         document.head.appendChild(style);
-        this.sheet = style.sheet;
+        this.sheet = style.sheet as CSSStyleSheet;
         this.getTemplate = getTemplate;
     }
 

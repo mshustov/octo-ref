@@ -1,3 +1,4 @@
+/// <reference path="./interfaces.d.ts" />
 const controlKey = {
     cmd: 'metaKey',
     alt: 'altKey'
@@ -10,7 +11,7 @@ const tsKind2Type = {
 
 const ESC = 27;
 
-class GitTern{
+class OctoRef{
     constructor(root, Adapter, config){
         this.findDefinition= this.findDefinition.bind(this);
         this.showDefinition = this.showDefinition.bind(this);
@@ -18,7 +19,6 @@ class GitTern{
         this.keyupHandler = this.keyupHandler.bind(this);
         this.domAPI = new Adapter(root);
         this.config = config;
-        // TODO remove handlers
 
         if(this.domAPI.isCodePage()){
             this.addHandlers();
@@ -58,13 +58,11 @@ class GitTern{
         this.clean();
         const elem = this.domAPI.getElem();
         const line = this.domAPI.getLineNumber(elem);
-        const ch = this.domAPI.getEndColumnPosition(elem);
-
-        this.send('definition', {end: {line, ch}},this.showDefinition);
+        const character = this.domAPI.getEndColumnPosition(elem);
+        this.send('definition', {end: {line, character}}, this.showDefinition);
     }
 
     send(cmd, data, cb){
-        // FIX ME - add long live connection
         chrome.extension.sendMessage({ cmd, data }, cb);
     }
 
@@ -81,4 +79,4 @@ class GitTern{
     }
 }
 
-export default GitTern;
+export default OctoRef;

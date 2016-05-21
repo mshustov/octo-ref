@@ -1,4 +1,4 @@
-import GitTern from '../../../src/lib/core';
+import OctoRef from '../../../src/lib/core';
 const config = require('../../../src/config.json');
 
 import chai = require('chai');
@@ -13,10 +13,10 @@ describe('core', function(){
             subscribe: spySubscribe,
             getFileContent: () => 'fileContent'
         }
-        GitTern.prototype.send = spySend;
+        OctoRef.prototype.send = spySend;
         const stub = sinon.stub().returns(Adapter)
         const root = {};
-        new GitTern(root, stub, config);
+        new OctoRef(root, stub, config);
         expect(stub.calledWithNew).to.be.ok;
         expect(spySubscribe.calledWith('click')).to.be.ok;
         expect(spySend.calledWith('register', {content: 'fileContent'})).to.be.ok;
@@ -24,7 +24,7 @@ describe('core', function(){
 
     it('#findDefinition ', function() {
         const line = 3;
-        const ch = 5;
+        const character = 5;
         const spyClean = sinon.spy();
         const spySend = sinon.spy();
         const mockAdapter = function () {
@@ -33,17 +33,17 @@ describe('core', function(){
                 clean: spyClean,
                 getElem: () => {},
                 getLineNumber: () => line,
-                getEndColumnPosition: () => ch
+                getEndColumnPosition: () => character
             };
         }
 
-        GitTern.prototype.send = spySend;
+        OctoRef.prototype.send = spySend;
         const root = {};
-        var instance = new GitTern(root, mockAdapter, config);
+        var instance = new OctoRef(root, mockAdapter, config);
         instance.findDefinition();
 
         expect(spyClean.calledOnce).to.be.ok;
-        expect(spySend.calledWith('definition', { end: {line, ch} })).to.be.ok;
+        expect(spySend.calledWith('definition', { end: { line, character } })).to.be.ok;
     });
 
     it('#showDefinition ', function() {
@@ -55,9 +55,9 @@ describe('core', function(){
             };
         }
 
-        GitTern.prototype.send = () => null;
+        OctoRef.prototype.send = () => null;
         const root = {};
-        var instance = new GitTern(root, mockAdapter, config);
+        var instance = new OctoRef(root, mockAdapter, config);
 
         const data = {start: 'start', end: 'end'};
         instance.showDefinition([data]);
@@ -79,9 +79,9 @@ describe('core', function(){
             };
         }
 
-        GitTern.prototype.send = () => null;
+        OctoRef.prototype.send = () => null;
         const root = {};
-        const instance = new GitTern(root, mockAdapter, config);
+        const instance = new OctoRef(root, mockAdapter, config);
         const stub = sinon.stub(instance, 'findDefinition');
         instance.clickHandler({});
         expect(stub.notCalled).to.be.ok;

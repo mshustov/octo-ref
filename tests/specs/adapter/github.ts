@@ -1,6 +1,6 @@
 /// <reference path="../../../typings/main.d.ts" />
 /// <reference path="../../../typings/specs.d.ts" />
-import Adapter from '../../../src/adapter/github.js';
+import Adapter from '../../../src/adapter/github';
 
 var adapter;
 

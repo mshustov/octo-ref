@@ -1,4 +1,4 @@
-/// <reference path="../../typings/_custom.d.ts" />
+/// <reference path="../../typings/vendors.d.ts" />
 
 import * as React from 'react';
 import { CompactPicker } from 'react-color';
@@ -7,9 +7,15 @@ import Radio from './radio';
 import syncer from '../lib/sync-storage'
 import * as objectAssign from 'object-assign';
 
-class App extends React.Component<any, any> {
-    constructor(props, ctx) {
-        super(props, ctx);
+interface AppState {
+    displayColorPicker?: boolean,
+    currentType?: string,
+    data?: any
+}
+
+class App extends React.Component<{}, AppState> {
+    constructor(props) {
+        super(props);
         this.state = {
           displayColorPicker: false,
           currentType: null,
@@ -21,12 +27,14 @@ class App extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        syncer.getData('gitTern', (data) => this.setState({data: data.gitTern}));
+        syncer.getData('octoRef', (data) => this.setState({ data: data.octoRef }));
     }
 
     handleColorClick(type) {
-        this.state.currentType = type;
-        this.setState({ displayColorPicker: !this.state.displayColorPicker });
+        this.setState({
+            currentType: type,
+            displayColorPicker: !this.state.displayColorPicker
+        });
     }
 
     handleClose() {
@@ -35,7 +43,7 @@ class App extends React.Component<any, any> {
 
     handleChange(prop, value){
         var newValue = objectAssign({}, this.state.data, { [prop]: value });
-        syncer.setData({gitTern: newValue}, () => this.setState({data: newValue}));
+        syncer.setData({octoRef: newValue}, () => this.setState({data: newValue}));
     }
 
     render() {
@@ -55,25 +63,26 @@ class App extends React.Component<any, any> {
                     <input
                         type="checkbox"
                         checked={scroll}
-                        onClick={()=>this.handleChange('scroll', !scroll)} />
+                        onClick={() => this.handleChange('scroll', !scroll) }
+                    />
                     <span className="title">Scroll to definition</span>
                 </label>
                 <div className="row" onClick={ this.handleColorClick.bind(null, 'defColor') }>
-                    <span className="pallet" style={{backgroundColor: `#${defColor}`}} >
+                    <span className="pallet" style={{backgroundColor: defColor}} >
                         Definition color
                     </span>
                 </div>
                 <div className="row" onClick={ this.handleColorClick.bind(null, 'refColor') }>
-                    <span className="pallet" style={{backgroundColor: `#${refColor}`}} >
+                    <span className="pallet" style={{backgroundColor: refColor}} >
                         Reference color
                     </span>
                 </div>
                 {this.state.displayColorPicker &&
                 <CompactPicker
-                  color={ this.state.color }
-                  position="below"
-                  onChange={(color)=> {this.handleClose(); this.handleChange(this.state.currentType, color.hex)}}
-                  onClose={ this.handleClose }
+                    color={this.state.data[this.state.currentType]}
+                    position="below"
+                    onChange={(color) => { this.handleClose(); this.handleChange(this.state.currentType, color.hex) }}
+                    onClose={this.handleClose}
                 />
                 }
             </div>

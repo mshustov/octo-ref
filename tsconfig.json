@@ -13,6 +13,7 @@
     "exclude": [
         "build",
         "node_modules",
+        "promise",
         "typings/browser.d.ts",
         "typings/browser"
     ]

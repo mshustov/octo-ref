@@ -1,12 +1,19 @@
 import * as React from 'react';
 
-const Radio = (props, ctx) => (
+interface Props {
+    name: string,
+    checked: boolean,
+    value: string,
+    onChange: (value: string) => void
+}
+
+const Radio: React.StatelessComponent<Props> = (props, ctx) => (
     <label className="radio">
         <input
             type="radio"
             name={props.name}
             checked={props.checked}
-            onClick={()=>props.onClick(props.value)}
+            onChange={()=>props.onChange(props.value)}
         />
         {props.value}
     </label>

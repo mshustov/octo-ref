@@ -16,7 +16,8 @@ module.exports = function(config) {
         webpack: {
             devtool: 'inline-source-map',
             module: webpackConfig.module,
-            resolve: webpackConfig.resolve
+            resolve: webpackConfig.resolve,
+            stats: webpackConfig.stats
         },
         exclude: [],
         reporters: ['mocha'],

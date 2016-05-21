@@ -1,4 +1,8 @@
-class VFS{
+///<reference path="../../typings/vendors.d.ts"/>
+
+class VFS implements VFS{
+    cache: {[key: string]: string}
+
     constructor() {
         this.cache = {};
     }
@@ -7,7 +11,7 @@ class VFS{
         return Object.keys(this.cache);
     }
 
-    addFile(filename, content, isDefaultLib) {
+    addFile(filename, content) {
         this.cache[filename] = content;
     }
 

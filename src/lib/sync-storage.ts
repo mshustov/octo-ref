@@ -1,4 +1,6 @@
-const syncer = {
+///<reference path="../../typings/vendors.d.ts"/>
+
+const syncer : Syncer = {
     getData(rule, cb){
         chrome.storage.sync.get(rule, cb);
     },
@@ -19,7 +21,7 @@ const syncer = {
     },
 
     subscribe(rule, cb) {
-        chrome.storage.onChanged.addListener(function(changes, namespace) {
+        chrome.storage.onChanged.addListener(function(changes) {
             for (var key in changes) {
                 if (key === rule){
                     cb(changes[key].newValue)

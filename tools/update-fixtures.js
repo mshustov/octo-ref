@@ -1,6 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 
+//switch to http://ionicabizau.net/blog/30-how-to-write-a-web-scraper-in-node-js
 var request = require('request');
 var cheerio = require('cheerio');
 

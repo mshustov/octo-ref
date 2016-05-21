@@ -1,19 +1,25 @@
+/// <reference path="../../typings/vendors.d.ts" />
+
+import { toArray } from '../lib/utils.ts';
+
 const GITHUB = {
     CONTAINER: 'blob-wrapper',
-    FILENAME: 'js-permalink-shortcut', // another for gist
+    FILENAME: 'js-permalink-shortcut',
     LINE: 'js-file-line',
     LINESHORT: 'LC',
     WRAPPER: 'text-wrapper-source'
 }
 
-const ELEMENT_NODE = 1;
-const TEXT_NODE = 3;
-
-interface Greetable {
-    greet(message: string): void;
+const enum NODE {
+    ELEMENT = 1,
+    TEXT = 3
 }
 
-class GihubDomAPI{
+class GihubDomAPI implements GihubDomAPI {
+    window: Window
+    root: HTMLElement
+    fileContent: string
+    fileName: string
     constructor(window) {
         this.window = window;
         this.root = window.document.querySelector(`.${GITHUB.CONTAINER}`);
@@ -48,12 +54,10 @@ class GihubDomAPI{
     }
 
     clean(selectors){
-        // FIXME ADD class option to CONFIG??
         const selectorClasses = selectors.map((selector) => `.${selector}`);
         // we need intersection of many
         const elems = this.window.document.querySelectorAll(selectorClasses);
-        return Array.from(elems).forEach((elem) => {
-            // elem.classList.remove.apply(elem.classList, selectors); // borrowed?
+        toArray(elems).forEach((elem) => {
             elem.classList.remove(...selectors); // borrowed?
             if (elem.classList.contains(GITHUB.WRAPPER)){
                 elem.parentNode.replaceChild(elem.firstChild, elem);
@@ -90,7 +94,6 @@ class GihubDomAPI{
         }
 
         var selection = this.window.getSelection();
-        // selection.modify('move', 'forward', 'word');
         let pos = selection ? selection.focusOffset : 0;
 
         // count horizontal offset
@@ -101,6 +104,22 @@ class GihubDomAPI{
         return pos;
     }
 
+    _iterateUnitlOffset(root, endOffset){
+        let elem;
+        let offset = 0;
+        let lastElemOffset = 0;
+
+        do {
+            elem = elem ? elem.nextSibling : root.firstChild;
+            lastElemOffset = this.getElemLength(elem);
+            offset += lastElemOffset;
+        } while (offset <= endOffset)
+
+        offset -= lastElemOffset;
+
+        return { elem, offset };
+    }
+
     show(data, options){
         if (!data) {
             return;
@@ -108,27 +127,17 @@ class GihubDomAPI{
         const {scroll, className} = options;
         const line = data.start.line;
         const root = this.window.document.getElementById(`${GITHUB.LINESHORT}${line}`);
-        let elem;
-        let offset = 0;
-        let lastElemOffset=0;
-
-        do {
-            elem = elem ? elem.nextSibling : root.firstChild;
-            lastElemOffset = this.getElemLength(elem);
-            offset += lastElemOffset;
-        } while (offset <= data.start.character)
-
-        offset -= lastElemOffset;
+        const { elem, offset } = this._iterateUnitlOffset(root, data.start.character)
 
         switch(elem.nodeType){
-            case ELEMENT_NODE:
+            case NODE.ELEMENT:
                 // chrome doesn't support mulitple select
                 // proboably when it does, we should switch to selectNode
                 // rng = document.createRange(); rng.selectRange(elem);
                 elem.classList.add(className);
                 break;
 
-            case TEXT_NODE:
+            case NODE.TEXT:
                 const rng = this.window.document.createRange();
                 rng.setStart(elem, data.start.character - offset);
                 rng.setEnd(elem, data.start.character + data.length - offset);
@@ -137,17 +146,18 @@ class GihubDomAPI{
                 rng.surroundContents(highlightWrapper);
                 break;
         }
-        if (scroll){
-            elem.scrollIntoViewIfNeeded();
+        if (scroll && data.kind === 'writtenReference') {
+            const scrollTo = elem.nodeType === NODE.ELEMENT ? elem : elem.parentElement;
+            scrollTo.scrollIntoViewIfNeeded();
         }
     }
 
     getElemLength(elem){
         switch(elem.nodeType){
-            case ELEMENT_NODE:
+            case NODE.ELEMENT:
                 return elem.innerText.length;
 
-            case TEXT_NODE:
+            case NODE.TEXT:
                 return elem.length;
 
             default :
