@@ -11,7 +11,7 @@ const template = (selector, color) =>
     `.${selector}
     {
         borderf-radius: 3px;
-        background-color: ${color};
+        background-color: #${color};
     }`
 
 const styler = new Styler(template);

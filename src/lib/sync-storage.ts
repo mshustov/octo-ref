@@ -10,6 +10,7 @@ const syncer : Syncer = {
     },
 
     getDataSetDefault(rule, defaultValue, cb){
+        // chrome.storage.sync.remove(rule);
         this.getData(rule, (data) => {
             let value = data[rule];
             if(!value) {
