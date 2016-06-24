@@ -19,3 +19,5 @@ greet = greet.bind(null, options);
 ['Alice', 'John'].forEach(function(name){
     console.log(name, 'said:', greet(hello, world));
 })
+
+[1,2,3].map(i => i + 1 );
