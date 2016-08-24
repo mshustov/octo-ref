@@ -9,6 +9,8 @@ var options = {
 
 /*
 * a la jsdoc comment
+
+
 */
 function greet(options, first, second){
     if (options.silent){
@@ -18,6 +20,11 @@ function greet(options, first, second){
     return local
 }
 
+/*
+    Here
+
+    and here
+*/
 greet = greet.bind(null, options);
 
 ['Alice', 'John'].forEach(function(name){
