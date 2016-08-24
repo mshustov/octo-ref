@@ -59,7 +59,12 @@ class OctoRef{
         const elem = this.domAPI.getElem();
         const line = this.domAPI.getLineNumber(elem);
         const character = this.domAPI.getEndColumnPosition(elem);
+        console.log(line, character);
+        debugger;
         this.send('definition', {end: {line, character}}, this.showDefinition);
+    //     this.send('definition', {end: {line - 1, character}}, (a) => console.log.bind(console, '________0', a);
+    //     this.send('definition', {end: {line + 0, character}}, (a) => console.log.bind(console, '________1', a);
+    //     this.send('definition', {end: {line + 1, character}}, (a) => console.log.bind(console, '________2', a);
     }
 
     send(cmd, data, cb){

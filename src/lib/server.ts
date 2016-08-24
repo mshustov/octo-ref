@@ -12,22 +12,29 @@ class Server{
         this.vfs = new VFS();
         const lsHost: ts.LanguageServiceHost = {
             getCompilationSettings : () => {
-                return objectAssign(ts.getDefaultCompilerOptions(), {
-                    noResolve: true,
+                const options = ts.getDefaultCompilerOptions();
+                return objectAssign(options, {
+                    allowJs: true,
                     allowNonTsExtensions: true,
-                    allowJs: true
+                    noResolve: true,
+                    removeComments: false
                 });
             },
             getScriptFileNames : () => this.vfs.getFileNames(),
             getScriptSnapshot: (filename) => {
                 const content = this.vfs.getFile(filename);
-                return content
-                    ? ts.ScriptSnapshot.fromString(content) as ts.IScriptSnapshot
-                    : null;
+                if(content) {
+                    const snapshot = ts.ScriptSnapshot.fromString(content) as ts.IScriptSnapshot;
+                    return snapshot;
+                }
+                return null;
             },
             getScriptVersion: () => '1',
             getCurrentDirectory: () => '',
-            getDefaultLibFileName : () => ts.getDefaultLibFileName(ts.getDefaultCompilerOptions())
+            getDefaultLibFileName : () => {
+                const options = ts.getDefaultCompilerOptions();
+                return ts.getDefaultLibFileName(options);
+            }
         }
         this.ls = ts.createLanguageService(lsHost, ts.createDocumentRegistry());
         this.linkCounter = {};
@@ -47,7 +54,9 @@ class Server{
 
     getDefinition(filename, line, col){
         // line, col --> pos on github level
-        const pos = ts.getPositionOfLineAndCharacter(this.ls.getSourceFile(filename), line - 1, col - 1);
+        const sourceFile = this.ls.getSourceFile(filename) as ts.SourceFile;
+        debugger;
+        const pos = ts.getPositionOfLineAndCharacter(sourceFile, line - 1, col - 1);
         const highlights = this.ls.getDocumentHighlights(filename, pos, [filename]);
         const result = highlights ? 
             highlights[0].highlightSpans.map(({kind, textSpan}) => {

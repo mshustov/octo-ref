@@ -125,7 +125,7 @@ class GihubDomAPI implements GihubDomAPI {
             return;
         }
         const {scroll, className} = options;
-        const line = data.start.line;
+        const line = data.start.line; // FIXME github shift
         const root = this.window.document.getElementById(`${GITHUB.LINESHORT}${line}`);
         const { elem, offset } = this._iterateUnitlOffset(root, data.start.character)
 
