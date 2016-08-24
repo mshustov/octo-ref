@@ -52,17 +52,13 @@ class Server{
         }
     }
 
-// ts.getLineAndCharacterOfPosition(this.ls.getSourceFile(filename), 1348)  - get {ch, line}
-// this.ls.getDocumentHighlights(filename, 1348, [filename]) - get highlight
-
-
     getDefinition(filename, line, col){
         // line, col --> pos on github level
         const sourceFile = this.ls.getSourceFile(filename) as ts.SourceFile;
         debugger;
         const pos = ts.getPositionOfLineAndCharacter(sourceFile, line - 1, col - 1);
         const highlights = this.ls.getDocumentHighlights(filename, pos, [filename]);
-        const result = highlights ?
+        const result = highlights ? 
             highlights[0].highlightSpans.map(({kind, textSpan}) => {
                 const {line, character} = ts.getLineAndCharacterOfPosition(this.ls.getSourceFile(filename), textSpan.start);
                 return {
