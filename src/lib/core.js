@@ -22,7 +22,13 @@ class OctoRef{
 
         if(this.domAPI.isCodePage()){
             this.addHandlers();
-            this.send('register', { content: this.domAPI.getFileContent() }, (err, status) => console.log(status));
+            this.send('register',
+                {
+                    content: this.domAPI.getFileContent(),
+                    url: window.location.pathname
+                },
+                (err, status) => console.log(status)
+            );
         }
     }
 
@@ -61,7 +67,13 @@ class OctoRef{
         const character = this.domAPI.getEndColumnPosition(elem);
         console.log(line, character);
         debugger;
-        this.send('definition', {end: {line, character}}, this.showDefinition);
+        this.send('definition',
+            {
+                end: {line, character},
+                url: window.location.pathname
+            },
+            this.showDefinition
+        );
     //     this.send('definition', {end: {line - 1, character}}, (a) => console.log.bind(console, '________0', a);
     //     this.send('definition', {end: {line + 0, character}}, (a) => console.log.bind(console, '________1', a);
     //     this.send('definition', {end: {line + 1, character}}, (a) => console.log.bind(console, '________2', a);

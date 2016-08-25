@@ -5,7 +5,7 @@ const tabIdToUrl = {};
 
 // extension
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
-    const filename = sender.url;
+    const filename = request.data.url; // sender.url !== window.location.url
     switch(request.cmd){
         case 'register':
             server.addFile(filename, request.data.content);
