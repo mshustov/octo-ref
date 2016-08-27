@@ -3,7 +3,6 @@ const server = new Server();
 // cache is cleared on every browser restart due to manifest settings
 const tabIdToUrl = {};
 
-// extension
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
     const filename = request.data.url; // sender.url !== window.location.url
     switch(request.cmd){

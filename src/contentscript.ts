@@ -1,5 +1,5 @@
 import * as injection from 'github-injection';
-import OctoRef from './lib/core.js';
+import OctoRef from './lib/core';
 import Styler from './lib/update-style';
 import syncer from './lib/sync-storage';
 import Adapter from './adapter/github';
@@ -10,8 +10,8 @@ const config = require('./config.json');
 const template = (selector, color) =>
     `.${selector}
     {
-        borderf-radius: 3px;
         background-color: #${color};
+        pointer-events: none;
     }`
 
 const styler = new Styler(template);

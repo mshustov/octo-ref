@@ -7,3 +7,13 @@ export const endsWith = (str:string, end:string) : boolean=> {
 
 export const toArray = (iterable: any): any[] =>
     Array.prototype.slice.apply(iterable);
+
+// NOTE: late could be moved in settings
+export const controlKey = {
+    alt: 'altKey',
+    cmd: 'metaKey'
+}
+
+export enum keyCode {
+    ESC = 27
+}

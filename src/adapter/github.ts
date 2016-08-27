@@ -74,6 +74,13 @@ class GihubDomAPI implements GihubDomAPI {
         return selection.focusNode;
     }
 
+    getElemPosition(elem){
+        const line = this.getLineNumber(elem);
+        const character = this.getEndColumnPosition(elem);
+
+        return { line, character };
+    }
+
     getLineNumber(elem){
         while(elem = elem.parentNode){
             if(elem.classList && elem.classList.contains(GITHUB.LINE)) {
@@ -104,7 +111,7 @@ class GihubDomAPI implements GihubDomAPI {
         return pos;
     }
 
-    _iterateUnitlOffset(root, endOffset){
+    private _iterateUnitlOffset(root, endOffset){
         let elem;
         let offset = 0;
         let lastElemOffset = 0;
@@ -120,36 +127,54 @@ class GihubDomAPI implements GihubDomAPI {
         return { elem, offset };
     }
 
-    show(data, options){
-        if (!data) {
-            return;
-        }
-        const {scroll, className} = options;
-        const line = data.start.line; // FIXME github shift
-        const root = this.window.document.getElementById(`${GITHUB.LINESHORT}${line}`);
+    private _createDOMWrapper(className){
+        const highlightWrapper = this.window.document.createElement('span');
+        highlightWrapper.classList.add(GITHUB.WRAPPER, className);
+        return highlightWrapper;
+    }
+
+    private _createHighlightDOMWrapper(elem, { start, end }, className){
+        const rng = this.window.document.createRange();
+        rng.setStart(elem, start);
+        rng.setEnd(elem, end);
+
+        const highlightWrapper = this._createDOMWrapper(className);
+        rng.surroundContents(highlightWrapper);
+    }
+
+    private _getDOMMappring(data){
+        const line = data.start.line;
+        const root = this.window.document.getElementById(`${GITHUB.LINESHORT}${line}`);  // FIXME hardcoded stuff
         const { elem, offset } = this._iterateUnitlOffset(root, data.start.character)
+        return { elem, offset };
+    }
+
+    highlight(data, options){
+        const { elem, offset } = this._getDOMMappring(data);
+        const {scroll, className} = options;
 
         switch(elem.nodeType){
             case NODE.ELEMENT:
                 // chrome doesn't support mulitple select
                 // proboably when it does, we should switch to selectNode
-                // rng = document.createRange(); rng.selectRange(elem);
+                // google: Discontiguous selection is not supported.
                 elem.classList.add(className);
                 break;
 
             case NODE.TEXT:
-                const rng = this.window.document.createRange();
-                rng.setStart(elem, data.start.character - offset);
-                rng.setEnd(elem, data.start.character + data.length - offset);
-                const highlightWrapper = this.window.document.createElement('span');
-                highlightWrapper.classList.add(GITHUB.WRAPPER, className);
-                rng.surroundContents(highlightWrapper);
+                const start = data.start.character - offset;
+                const end = data.start.character + data.length - offset;
+
+                this._createHighlightDOMWrapper(elem, { start, end }, className)
                 break;
         }
-        if (scroll && data.kind === 'writtenReference') {
-            const scrollTo = elem.nodeType === NODE.ELEMENT ? elem : elem.parentElement;
-            scrollTo.scrollIntoViewIfNeeded();
-        }
+    }
+
+    jumpToDefinition(data){
+        const { elem } = this._getDOMMappring(data);
+        // FIXME
+        const scrollTo = elem.nodeType === NODE.ELEMENT ? elem : elem.parentElement;
+        scrollTo.scrollIntoViewIfNeeded();
     }
 
     getElemLength(elem){

@@ -19,12 +19,13 @@ declare interface OctoRef {
     constructor(root: HTMLElement, Adapter: GihubDomAPI, config: any)
     addHandlers(): void
     removeHandlers(): void
-    clickHandler(e: MouseEvent): void
-    keyupHandler(e: KeyboardEvent): void
+    _handleMousedown(e: MouseEvent): void
+    _handleClick(e: MouseEvent): void
+    _handleKeyup(e: KeyboardEvent): void
     clean(): void
-    findDefinition(): void
+    findDefinition(shouldJumpToDefinition: boolean): void
     send(cmd: string, data: any, cb: () => void)
-    showDefinition(data: Highlight[])
+    showDefinition(shouldJumpToDefinition: boolean, data: Highlight[])
 }
 
 declare interface Syncer {
@@ -71,6 +72,11 @@ interface Highlight {
     start: Location
 }
 
+interface OffsetElem {
+    elem: HTMLElement;
+    offset: number;
+}
+
 declare interface Server {
     constructor()
     vfs: VFS
@@ -96,7 +102,14 @@ declare interface GihubDomAPI {
     clean(selectors: string[]): void
     getElem(): HTMLElement
     getElemLength(elem: HTMLElement): number
+    getElemPosition (elem: HTMLElement): Location
     getLineNumber(elem: HTMLElement): number
     getEndColumnPosition(elem: HTMLElement): number
-    show(data: Highlight, {scroll: boolean, className: string}): void
+
+    _iterateUnitlOffset(root: HTMLElement, endOffset: number): OffsetElem
+    _createDOMWrapper(className: string): HTMLElement
+    _createHighlightDOMWrapper(elem: HTMLElement, position: Location, className: string): void
+    _getDOMMappring(data: Highlight): OffsetElem
+    highlight(data: Highlight, {className: string}): void
+    jumpToDefinition(data: Highlight): void
 }

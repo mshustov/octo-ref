@@ -2476,7 +2476,7 @@ declare namespace chrome.extension {
 	 * Since Chrome 12.
 	 * @param callback The callback parameter should be a function that looks like this:
 	 * function(boolean isAllowedAccess) {...};
-	 * Parameter isAllowedAccess: True if the extension can access the 'file://' scheme, false otherwise.
+	 * Parameter isAllowedAccesssendMessage: True if the extension can access the 'file://' scheme, false otherwise.
 	 */
     export function isAllowedFileSchemeAccess(callback: (isAllowedAccess: boolean) => void): void;
 	/**
