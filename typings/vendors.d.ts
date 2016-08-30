@@ -19,13 +19,13 @@ declare interface OctoRef {
     constructor(root: HTMLElement, Adapter: GihubDomAPI, config: any)
     addHandlers(): void
     removeHandlers(): void
-    _handleMousedown(e: MouseEvent): void
-    _handleClick(e: MouseEvent): void
-    _handleKeyup(e: KeyboardEvent): void
+    handleMousedown(e: MouseEvent): void
+    handleClick(e: MouseEvent): void
+    handleKeyup(e: KeyboardEvent): void
     clean(): void
     findDefinition(shouldJumpToDefinition: boolean): void
     send(cmd: string, data: any, cb: () => void)
-    showDefinition(shouldJumpToDefinition: boolean, data: Highlight[])
+    doHighlight(shouldJumpToDefinition: boolean, data: Highlight[])
 }
 
 declare interface Syncer {
@@ -100,6 +100,7 @@ declare interface GihubDomAPI {
     subscribe(event: string, fn: (e: Event) => void): void
     unsubscribe(event: string, fn: (e: Event) => void): void
     clean(selectors: string[]): void
+    getSelectedElemPosition():Location
     getElem(): HTMLElement
     getElemLength(elem: HTMLElement): number
     getElemPosition (elem: HTMLElement): Location

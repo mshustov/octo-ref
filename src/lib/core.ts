@@ -24,27 +24,29 @@ function isNextUsage (item: Highlight, currentPosition: Location): boolean{
 }
 
 class OctoRef{
+    url: string
     domAPI: GihubDomAPI
     config: any
 
-    constructor(root, Adapter, config){
-        console.log('----NEW-INSTANCE----');
-        this.findDefinition= this.findDefinition.bind(this);
-        this.doHighlight = this.doHighlight.bind(this); // TODO rename in highlight definition
-
-        this._handleMousedown = this._handleMousedown.bind(this);
-        this._handleClick = this._handleClick.bind(this);
-        this._handleKeyup = this._handleKeyup.bind(this);
-
-        this.domAPI = new Adapter(root);
-        this.config = config;
-
+    constructor(win, Adapter, config){
+        // todo add static method
+        this.domAPI = new Adapter(win);
         if(this.domAPI.isCodePage()){
+            this.url = win.location.pathname;
+            this.findDefinition= this.findDefinition.bind(this);
+            this.doHighlight = this.doHighlight.bind(this); // TODO rename in highlight definition
+
+            this.handleMousedown = this.handleMousedown.bind(this);
+            this.handleClick = this.handleClick.bind(this);
+            this.handleKeyup = this.handleKeyup.bind(this);
+
+            this.config = config;
+        
             this.addHandlers();
             this.send('register',
                 {
                     content: this.domAPI.getFileContent(),
-                    url: window.location.pathname
+                    url: this.url
                 },
                 (err, status) => console.log(status)
             );
@@ -52,27 +54,31 @@ class OctoRef{
     }
 
     addHandlers(){
-        this.domAPI.subscribe('mousedown', this._handleMousedown);
-        this.domAPI.subscribe('click', this._handleClick);
-        this.domAPI.subscribe('keyup', this._handleKeyup);
+        this.domAPI.subscribe('mousedown', this.handleMousedown);
+        this.domAPI.subscribe('click', this.handleClick);
+        this.domAPI.subscribe('keyup', this.handleKeyup);
     }
 
     removeHandlers(){
-        this.domAPI.unsubscribe('mousedown', this._handleMousedown);
-        this.domAPI.unsubscribe('click', this._handleClick);
-        this.domAPI.unsubscribe('keyup', this._handleKeyup);
+        this.domAPI.unsubscribe('mousedown', this.handleMousedown);
+        this.domAPI.unsubscribe('click', this.handleClick);
+        this.domAPI.unsubscribe('keyup', this.handleKeyup);
     }
 
-    private _handleMousedown(e){
+    handleMousedown(e){
         this.clean();
     }
 
-    private _handleClick(e){
-        const shouldDo = {
+    getDesiredActions(e){
+        return {
             highlightOnly: e[controlKey.alt], // ?
             jumpToNextUsage: e[controlKey.cmd] && !e[controlKey.alt],
             jumpToDefinition: e[controlKey.cmd] && e[controlKey.alt]
         }
+    }
+
+    handleClick(e){
+        const shouldDo = this.getDesiredActions(e);
 
         const hasActionToDo = Object.keys(shouldDo).some(key => shouldDo[key]);
         if(hasActionToDo) {
@@ -80,7 +86,7 @@ class OctoRef{
         }
     }
 
-    private _handleKeyup(e){
+    handleKeyup(e){
         if (e.keyCode === keyCode.ESC) {
             this.clean();
         }
@@ -91,15 +97,13 @@ class OctoRef{
         this.domAPI.clean(classNames);
     }
 
-    findDefinition(shouldDo){
-        // this.clean();
-        const elem = this.domAPI.getElem();
-        const position = this.domAPI.getElemPosition(elem);
-
+    findDefinition(shouldDo = {}){
+        const position = this.domAPI.getSelectedElemPosition();
+        const url = this.url;
         this.send('definition',
             {
                 end: position,
-                url: window.location.pathname
+                url
             },
             (data) => {
                 this.doHighlight(shouldDo, data, position);

@@ -1,95 +1,87 @@
-// import OctoRef from '../../../src/lib/core';
-// const config = require('../../../src/config.json');
+import OctoRef from '../../../src/lib/core';
+const config = require('../../../src/config.json');
 
-// import chai = require('chai');
-// const expect = chai.expect;
+import * as objectAssign from 'object-assign';
+import chai = require('chai');
+const expect = chai.expect;
 
-// describe('core', function(){
-//     it('constructor should create instance', function() {
-//         const spySubscribe = sinon.spy();
-//         const spySend = sinon.spy();
-//         const Adapter = {
-//             isCodePage: () => true,
-//             subscribe: spySubscribe,
-//             getFileContent: () => 'fileContent'
-//         }
-//         OctoRef.prototype.send = spySend;
-//         const stub = sinon.stub().returns(Adapter)
-//         const root = {};
-//         new OctoRef(root, stub, config);
-//         expect(stub.calledWithNew).to.be.ok;
-//         expect(spySubscribe.calledWith('click')).to.be.ok;
-//         expect(spySend.calledWith('register', {content: 'fileContent'})).to.be.ok;
-//     });
+describe('core', function(){
+    const pathname = 'http://url.com';
+    const root = {
+        location: { pathname }
+    };
+    const defMock = {
+        isCodePage: () => true,
+        subscribe: ()=> null,
+        getFileContent: () => 'fileContent',
+    }
+    const makeMockAdapter = (customProps = {}) => () =>
+            objectAssign({}, defMock, customProps)
 
-//     it('#findDefinition ', function() {
-//         const line = 3;
-//         const character = 5;
-//         const spyClean = sinon.spy();
-//         const spySend = sinon.spy();
-//         const mockAdapter = function () {
-//             return {
-//                 isCodePage: () => false, // to prevent subscibe
-//                 clean: spyClean,
-//                 getElem: () => {},
-//                 getLineNumber: () => line,
-//                 getEndColumnPosition: () => character
-//             };
-//         }
 
-//         OctoRef.prototype.send = spySend;
-//         const root = {};
-//         var instance = new OctoRef(root, mockAdapter, config);
-//         instance.findDefinition(false); // FIXME
+    it('constructor should create instance', function() {
+        const spySubscribe = sinon.spy();
+        const spySend = sinon.spy();
 
-//         expect(spyClean.calledOnce).to.be.ok;
-//         expect(spySend.calledWith('definition', { end: { line, character } })).to.be.ok;
-//     });
+        const mockAdapter = makeMockAdapter({
+            subscribe: spySubscribe
+        })
 
-//     it('#showDefinition ', function() {
-//         const spyShow = sinon.spy();
-//         const mockAdapter = function () {
-//             return {
-//                 isCodePage: () => false,
-//                 show: spyShow
-//             };
-//         }
+        OctoRef.prototype.send = spySend;
+        new OctoRef(root, mockAdapter, config);
 
-//         OctoRef.prototype.send = () => null;
-//         const root = {};
-//         var instance = new OctoRef(root, mockAdapter, config);
+        expect(spySubscribe.calledWith('click')).to.be.ok;
+        expect(spySend.calledWith('register', { content: 'fileContent', url: pathname })).to.be.ok;
+    });
 
-//         const data = {start: 'start', end: 'end'};
-//         instance.showDefinition(false, [data]); // FIXME
+    it('#findDefinition ', function() {
+        const line = 3;
+        const character = 5;
 
-//         expect(spyShow.calledOnce).to.be.ok;
-//         expect(spyShow.calledWith(data)).to.be.ok;
-//     });
+        const spySend = sinon.spy();
 
-//     it('click + altKey should lead to findDefinition call', function() {
-//         const mockAdapter = function () {
-//             return {
-//                 isCodePage: () => true,
-//                 subscribe: ()=> null,
-//                 clean: () => null,
-//                 getFileContent: () => 'fileContent',
-//                 getElem: () => {},
-//                 getLineNumber: () => null,
-//                 getEndColumnPosition: () => null
-//             };
-//         }
+        const mockAdapter = makeMockAdapter({
+            getSelectedElemPosition: () => ({ line, character })
+        })
 
-//         OctoRef.prototype.send = () => null;
-//         const root = {};
-//         const instance = new OctoRef(root, mockAdapter, config);
-//         const stub = sinon.stub(instance, 'findDefinition');
-//         instance.clickHandler({});
-//         expect(stub.notCalled).to.be.ok;
+        OctoRef.prototype.send = spySend;
+        var instance = new OctoRef(root, mockAdapter, config);
+        instance.findDefinition();
 
-//         instance.clickHandler({});
-//         expect(stub.notCalled).to.be.ok;
+        expect(spySend.calledWith('definition', { end: { line, character }, url: pathname })).to.be.ok;
+    });
 
-//         instance.clickHandler({altKey: true});
-//         expect(stub.calledOnce).to.be.ok;
-//     });
-// })
+    it('#doHighlight', function() {
+        const shouldDo = {};
+        const currentPosition = {};
+        const spyHighlight = sinon.spy();
+
+        const mockAdapter = makeMockAdapter({
+            highlight: spyHighlight
+        })
+
+        var instance = new OctoRef(root, mockAdapter, config);
+
+        const data = {start: 'start', end: 'end'};
+        instance.doHighlight(shouldDo, [data], currentPosition); // FIXME
+
+        expect(spyHighlight.calledOnce).to.be.ok;
+        expect(spyHighlight.calledWith(data)).to.be.ok;
+    });
+
+    it('click + altKey should lead to findDefinition call', function() {
+        const mockAdapter = makeMockAdapter();
+
+        const instance = new OctoRef(root, mockAdapter, config);
+        const findDefStub = sinon.stub(instance, 'findDefinition');
+
+        instance.handleClick({});
+        expect(findDefStub.notCalled).to.be.ok;
+
+        instance.handleClick({});
+        expect(findDefStub.notCalled).to.be.ok;
+
+        instance.handleClick({altKey: true});
+        expect(findDefStub.calledOnce).to.be.ok;
+    });
+})

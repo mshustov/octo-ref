@@ -31,21 +31,28 @@ describe('github api', function(){
     });
 
     it('#getLineNumber should return line number', function() {
-        var elem = window.document.getElementById('LC9').querySelector('.pl-smi');
+        var elem = window.document.getElementById('LC13').querySelector('.pl-smi'); // greet
         var lineNumber = adapter.getLineNumber(elem);
-        assert.equal(lineNumber, 9);
+        assert.equal(lineNumber, 13);
     });
 
     it('#getElem should return the deepest selected element', function() {
-        var elem = window.document.getElementById('LC13').querySelector('.pl-c1');
+        var elem = window.document.getElementById('LC13').querySelector('.pl-smi'); // greet
         setSelection(window, elem);
 
         var selectedElem = adapter.getElem(); // textNode, childNode of elem
         assert.equal(selectedElem, elem.childNodes[0]);
     });
 
+    it('#getElemPosition should return object with position on element. shape {line, character}', function() {
+        var elem = window.document.getElementById('LC13').querySelector('.pl-smi'); // greet
+
+        var selectedElem = adapter.getElemPosition(elem);
+        assert.deepEqual(selectedElem, { line: 13, character: 15 });
+    });
+
     it('#getEndColumnPosition should return end last position for element', function() {
-        var elem = window.document.getElementById('LC17').querySelector('.pl-c1');
+        var elem = window.document.getElementById('LC21').querySelector('.pl-c1'); // join
         var charNumber = adapter.getEndColumnPosition(elem);
         assert.equal(charNumber, 19, 'without selection');
 
@@ -55,7 +62,7 @@ describe('github api', function(){
     });
 
     it('#getElemLength should return length of elem content', function() {
-        var elem = window.document.getElementById('LC17').querySelector('.pl-c1');
+        var elem = window.document.getElementById('LC21').querySelector('.pl-c1'); // join
         var contentLength = adapter.getElemLength(elem);
         assert.equal(contentLength, 4, 'for ELEMENT_NODE'); // 'null'
 
@@ -78,22 +85,22 @@ describe('github api', function(){
 
     it('#show should add class name (wrap text node)', function() {
         var refs = {
-            start: {character: 4, line: 1}, // hello
+            start: {character: 4, line: 2}, // hello
             length: 5
         };
         var options = {className: 'test-classname1'};
 
-        adapter.show(refs, options);
+        adapter.highlight(refs, options);
         // should we use xpath?
         var selectedElem = window.document.querySelector('.test-classname1') as HTMLElement;
         assert.equal(selectedElem.innerText, 'hello', 'wrap textNode');
 
         refs = {
-            start: {character: 8, line: 17}, // greet
+            start: {character: 8, line: 21}, // greet
             length: 5
         }
         options = {className: 'test-classname2'};
-        adapter.show(refs, options);
+        adapter.highlight(refs, options);
         var selectedElem = window.document.querySelector('.test-classname2') as HTMLElement;
         assert.equal(selectedElem.innerText, 'greet', 'add className to element node');
     });
@@ -104,7 +111,7 @@ describe('github api', function(){
             length: 5
         };
         var options = {className: 'test-classname1'};
-        adapter.show(refs, options);
+        adapter.highlight(refs, options);
         var elems = window.document.getElementsByClassName('test-classname1');
         assert.equal(elems.length, 1, 'add class name');
         adapter.clean(['test-classname1'])

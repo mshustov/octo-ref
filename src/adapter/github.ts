@@ -65,6 +65,13 @@ class GihubDomAPI implements GihubDomAPI {
         });
     }
 
+    getSelectedElemPosition(){
+        const elem = this.getElem();
+        const position = this.getElemPosition(elem);
+
+        return position;
+    }
+
     getElem(){
         const selection = this.window.getSelection();
          // forward to the end of the word. we need provide this info for tern.
