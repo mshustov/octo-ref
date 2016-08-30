@@ -7,15 +7,13 @@ const expect = chai.expect;
 
 describe('core', function(){
     const pathname = 'http://url.com';
-    const root = {
-        location: { pathname }
-    };
+
     const defMock = {
         isCodePage: () => true,
         subscribe: ()=> null,
         getFileContent: () => 'fileContent',
     }
-    const makeMockAdapter = (customProps = {}) => () =>
+    const makeMockAdapter = (customProps = {}) =>
             objectAssign({}, defMock, customProps)
 
 
@@ -28,7 +26,7 @@ describe('core', function(){
         })
 
         OctoRef.prototype.send = spySend;
-        new OctoRef(root, mockAdapter, config);
+        new OctoRef(mockAdapter, config, pathname);
 
         expect(spySubscribe.calledWith('click')).to.be.ok;
         expect(spySend.calledWith('register', { content: 'fileContent', url: pathname })).to.be.ok;
@@ -45,7 +43,7 @@ describe('core', function(){
         })
 
         OctoRef.prototype.send = spySend;
-        var instance = new OctoRef(root, mockAdapter, config);
+        var instance = new OctoRef(mockAdapter, config, pathname);
         instance.findDefinition();
 
         expect(spySend.calledWith('definition', { end: { line, character }, url: pathname })).to.be.ok;
@@ -60,7 +58,7 @@ describe('core', function(){
             highlight: spyHighlight
         })
 
-        var instance = new OctoRef(root, mockAdapter, config);
+        var instance = new OctoRef(mockAdapter, config, pathname);
 
         const data = {start: 'start', end: 'end'};
         instance.doHighlight(shouldDo, [data], currentPosition); // FIXME
@@ -72,7 +70,7 @@ describe('core', function(){
     it('click + altKey should lead to findDefinition call', function() {
         const mockAdapter = makeMockAdapter();
 
-        const instance = new OctoRef(root, mockAdapter, config);
+        const instance = new OctoRef(mockAdapter, config, pathname);
         const findDefStub = sinon.stub(instance, 'findDefinition');
 
         instance.handleClick({});

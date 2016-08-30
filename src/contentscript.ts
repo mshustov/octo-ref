@@ -16,7 +16,7 @@ const template = (selector, color) =>
 
 const styler = new Styler(template);
 
-const callback = (data) => {
+const syncCallback = (data) => {
     if(!data){
         return;
     }
@@ -27,15 +27,9 @@ const callback = (data) => {
     styler.updateStyle({refColor, defColor});
 }
 
-syncer.getDataSetDefault('octoRef', config.settings, callback);
-syncer.subscribe('octoRef', callback)
+syncer.getDataSetDefault('octoRef', config.settings, syncCallback);
+syncer.subscribe('octoRef', syncCallback)
 
-const adaptersMap = {
-    'github.com': 'github'
-    // 'gist.github.com': 'gist-github' // TODO add adapter
-};
-
-const type = adaptersMap[window.location.hostname];
 const isValidExtension = (str = '') => config.ext.some(endsWith.bind(null, str));
 
 let instance;
@@ -45,7 +39,8 @@ injection(window, function() {
         if(instance){
             instance.removeHandlers();
         }
-        instance = new OctoRef(window, Adapter, config);
+        const adapter = new Adapter(window)
+        instance = new OctoRef(adapter, config, window.location.pathname);
     }
 });
 

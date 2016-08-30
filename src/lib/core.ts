@@ -28,11 +28,10 @@ class OctoRef{
     domAPI: GihubDomAPI
     config: any
 
-    constructor(win, Adapter, config){
-        // todo add static method
-        this.domAPI = new Adapter(win);
+    constructor(adapter, config, url){
+        this.domAPI = adapter;
         if(this.domAPI.isCodePage()){
-            this.url = win.location.pathname;
+            this.url = url; //FIX ME merge config and url
             this.findDefinition= this.findDefinition.bind(this);
             this.doHighlight = this.doHighlight.bind(this); // TODO rename in highlight definition
 
