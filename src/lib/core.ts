@@ -28,8 +28,9 @@ class OctoRef{
     config: any
 
     constructor(root, Adapter, config){
+        console.log('----NEW-INSTANCE----');
         this.findDefinition= this.findDefinition.bind(this);
-        this.showDefinition = this.showDefinition.bind(this); // TODO rename in highlight definition
+        this.doHighlight = this.doHighlight.bind(this); // TODO rename in highlight definition
 
         this._handleMousedown = this._handleMousedown.bind(this);
         this._handleClick = this._handleClick.bind(this);
@@ -101,7 +102,7 @@ class OctoRef{
                 url: window.location.pathname
             },
             (data) => {
-                this.showDefinition(shouldDo, data, position);
+                this.doHighlight(shouldDo, data, position);
             }
         );
     }
@@ -111,7 +112,7 @@ class OctoRef{
         chrome.runtime.sendMessage({ cmd, data }, cb);
     }
 
-    showDefinition(shouldDo, data, position){
+    doHighlight(shouldDo, data, position){
         if (!data) return
 
         data.forEach((highlight) => {
@@ -128,8 +129,9 @@ class OctoRef{
 
         if(shouldDo.jumpToNextUsage){
             const nextData = data.find(item => isNextUsage(item, position));
+            const jumpToPosition = nextData || data[0];
 
-            this.domAPI.jumpToDefinition(nextData);
+            this.domAPI.jumpToDefinition(jumpToPosition);
         }
     }
 }
