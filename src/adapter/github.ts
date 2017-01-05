@@ -15,11 +15,20 @@ const enum NODE {
     TEXT = 3
 }
 
-class GihubDomAPI implements GihubDomAPI {
+class GithubDomAPI implements GithubDomAPI {
     window: Window
     root: HTMLElement
     fileContent: string
     fileName: string
+
+    static getClosestElement (startElem) {
+        let elem = startElem;
+        while (elem.nodeType !== NODE.ELEMENT) {
+            elem = elem.parentElement
+        }
+        return elem;
+    }
+
     constructor(window) {
         this.window = window;
         this.root = window.document.querySelector(`.${GITHUB.CONTAINER}`);
@@ -67,9 +76,26 @@ class GihubDomAPI implements GihubDomAPI {
 
     getSelectedElemPosition(){
         const elem = this.getElem();
-        const position = this.getElemPosition(elem);
+        const rawPosition = this.getElemPosition(elem);
+
+        const position = this.normalizeFromAdapterFormat(rawPosition);
 
         return position;
+    }
+
+    // ts and github have differnt offsets
+    normalizeFromAdapterFormat(position){
+        return {
+            line: position.line - 1,
+            character: position.character - 1
+        }
+    }
+
+    normalizeToAdapterFormat(position){
+        return {
+            line: position.line + 1,
+            character: position.character
+        }
     }
 
     getElem(){
@@ -179,8 +205,8 @@ class GihubDomAPI implements GihubDomAPI {
 
     jumpToDefinition(data){
         const { elem } = this._getDOMMappring(data);
-        // FIXME
-        const scrollTo = elem.nodeType === NODE.ELEMENT ? elem : elem.parentElement;
+
+        const scrollTo = GithubDomAPI.getClosestElement(elem);
         scrollTo.scrollIntoViewIfNeeded();
     }
 
@@ -196,6 +222,17 @@ class GihubDomAPI implements GihubDomAPI {
                 throw 'Unexpected type';
         }
     }
+
+    checkIsNextUsage (item, currentPosition) {
+        // TODO think probably it should be thought over to reduce casting cases
+        const castedCurrentPosition = this.normalizeToAdapterFormat(currentPosition);
+        const isNext = item.start.line > castedCurrentPosition.line || 
+            (
+                item.start.line === castedCurrentPosition.line &&
+                item.start.character > castedCurrentPosition.character
+            )
+        return isNext;
+    }
 }
 
-export default GihubDomAPI;
+export default GithubDomAPI;

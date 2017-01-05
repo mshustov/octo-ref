@@ -4,18 +4,18 @@ const server = new Server();
 const tabIdToUrl = {};
 
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
-    const filename = request.data.url; // sender.url !== window.location.url
+    const { url, content } = request.data; // NOTE: sender.url !== window.location.url
+
     switch(request.cmd){
         case 'register':
-            server.addFile(filename, request.data.content);
             // we don't want to request 'tab' permissions
-            tabIdToUrl[sender.tab.id] = filename;
+            tabIdToUrl[sender.tab.id] = url;
             callback('registered');
             break;
 
         case 'definition':
             const {line, character} = request.data.end;
-            const result = server.getDefinition(filename, line, character);
+            const result = server.getDefinition(url, line, character, content);
             callback(result);
             break;
 
@@ -26,6 +26,5 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
 
 chrome.tabs.onRemoved.addListener(function(tabId){
     const filename = tabIdToUrl[tabId];
-    server.removeFile(filename);
     delete tabIdToUrl[tabId];
 })

@@ -4,43 +4,34 @@
 // alt  - highlight stuff
 // cmd  - highlight stuff + jump to definition
 // alt + cmd  - highlight stuff + jump to next usage
+// https://github.com/Microsoft/TypeScript/blob/32a9196354638400680897da5a8e0d6715440cae/lib/typescript.d.ts
+// https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API
 
-import { controlKey, keyCode } from './utils.ts';
+import * as objectAssign from 'object-assign';
 
-const isDefinition = (item:Highlight): boolean => item.kind === 'writtenReference';
-const getClassName = (config: any, type: Highlight): string => {
-    return isDefinition(type) ?
-        config.className.source :
-        config.className.reference
-}
-
-function isNextUsage (item: Highlight, currentPosition: Location): boolean{
-    const isNext = item.start.line > currentPosition.line || 
-        (
-            item.start.line === currentPosition.line &&
-            item.start.character > currentPosition.character
-        )
-    return isNext;
-}
+import { controlKey, keyCode } from './utils';
 
 class OctoRef{
     url: string
-    domAPI: GihubDomAPI
+    domAPI: GithubDomAPI
     config: any
+    // NOTE: could be update to TS 2.x
+    static isDefinition(item: Highlight): boolean {
+        return item.kind === 'writtenReference';
+    }
 
     constructor(adapter, config, url){
         this.domAPI = adapter;
         if(this.domAPI.isCodePage()){
-            this.url = url; //FIX ME merge config and url
+            this.config = config;
+            this.url = url;
             this.findDefinition= this.findDefinition.bind(this);
-            this.doHighlight = this.doHighlight.bind(this); // TODO rename in highlight definition
+            this.highlight = this.highlight.bind(this);
 
             this.handleMousedown = this.handleMousedown.bind(this);
             this.handleClick = this.handleClick.bind(this);
             this.handleKeyup = this.handleKeyup.bind(this);
 
-            this.config = config;
-        
             this.addHandlers();
             this.send('register',
                 {
@@ -70,18 +61,18 @@ class OctoRef{
 
     getDesiredActions(e){
         return {
-            highlightOnly: e[controlKey.alt], // ?
+            highlightOnly: e[controlKey.alt],
             jumpToNextUsage: e[controlKey.cmd] && !e[controlKey.alt],
             jumpToDefinition: e[controlKey.cmd] && e[controlKey.alt]
         }
     }
 
     handleClick(e){
-        const shouldDo = this.getDesiredActions(e);
+        const actionsToDo = this.getDesiredActions(e);
 
-        const hasActionToDo = Object.keys(shouldDo).some(key => shouldDo[key]);
+        const hasActionToDo = Object.keys(actionsToDo).some(key => actionsToDo[key]);
         if(hasActionToDo) {
-            this.findDefinition(shouldDo);
+            this.findDefinition(actionsToDo);
         }
     }
 
@@ -96,16 +87,17 @@ class OctoRef{
         this.domAPI.clean(classNames);
     }
 
-    findDefinition(shouldDo = {}){
+    findDefinition(actionToDo = {}){
         const position = this.domAPI.getSelectedElemPosition();
         const url = this.url;
         this.send('definition',
             {
                 end: position,
-                url
+                url,
+                content: this.domAPI.getFileContent()
             },
             (data) => {
-                this.doHighlight(shouldDo, data, position);
+                this.highlight(actionToDo, data, position);
             }
         );
     }
@@ -115,34 +107,33 @@ class OctoRef{
         chrome.runtime.sendMessage({ cmd, data }, cb);
     }
 
-    doHighlight(shouldDo, data, position){
-        if (!data) return
+    highlight(actionToDo, rawData, position){
+        if (!rawData) return
+
+        const data = rawData.map(rawDataItem => objectAssign({}, rawDataItem, {
+            start: this.domAPI.normalizeToAdapterFormat(rawDataItem.start)
+        }));
 
         data.forEach((highlight) => {
-            const className = getClassName(this.config, highlight);
+            const isForDefiniton = OctoRef.isDefinition(highlight);
+            const className = this.config.getClassName(isForDefiniton);
 
             this.domAPI.highlight( highlight, { className });
         })
 
-        if(shouldDo.jumpToDefinition){
-            const defData = data.find(isDefinition);
+        if(actionToDo.jumpToDefinition){
+            const positionToJump = data.find(OctoRef.isDefinition);
 
-            this.domAPI.jumpToDefinition(defData);
+            this.domAPI.jumpToDefinition(positionToJump);
         }
 
-        if(shouldDo.jumpToNextUsage){
-            const nextData = data.find(item => isNextUsage(item, position));
-            const jumpToPosition = nextData || data[0];
+        if(actionToDo.jumpToNextUsage){
+            const nextData = data.find(item => this.domAPI.checkIsNextUsage(item, position));
+            const positionToJump = nextData || data[0];
 
-            this.domAPI.jumpToDefinition(jumpToPosition);
+            this.domAPI.jumpToDefinition(positionToJump);
         }
     }
 }
 
 export default OctoRef;
-
-/*
-https://github.com/Microsoft/TypeScript/blob/32a9196354638400680897da5a8e0d6715440cae/lib/typescript.d.ts
-https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API
-*/
-     

@@ -14,9 +14,15 @@ declare module "object-assign" {
 
 declare function require(string): any;
 
+declare interface ActionsToDo {
+    highlightOnly: boolean,
+    jumpToNextUsage: boolean,
+    jumpToDefinition: boolean
+}
+
 declare interface OctoRef {
     // root: HTMLElement;
-    constructor(root: HTMLElement, Adapter: GihubDomAPI, config: any)
+    constructor(root: HTMLElement, Adapter: GithubDomAPI, config: any)
     addHandlers(): void
     removeHandlers(): void
     handleMousedown(e: MouseEvent): void
@@ -25,7 +31,7 @@ declare interface OctoRef {
     clean(): void
     findDefinition(shouldJumpToDefinition: boolean): void
     send(cmd: string, data: any, cb: () => void)
-    doHighlight(shouldJumpToDefinition: boolean, data: Highlight[])
+    highlight(actionsToDo: ActionsToDo, data: Highlight[], position: Location)
 }
 
 declare interface Syncer {
@@ -87,7 +93,7 @@ declare interface Server {
     getDefinition(filename: string, line: number, col: number): Highlight[]
 }
 
-declare interface GihubDomAPI {
+declare interface GithubDomAPI {
     constructor(window: Window)
     window: Window
     root: HTMLElement
@@ -101,6 +107,7 @@ declare interface GihubDomAPI {
     unsubscribe(event: string, fn: (e: Event) => void): void
     clean(selectors: string[]): void
     getSelectedElemPosition():Location
+
     getElem(): HTMLElement
     getElemLength(elem: HTMLElement): number
     getElemPosition (elem: HTMLElement): Location
@@ -113,4 +120,8 @@ declare interface GihubDomAPI {
     _getDOMMappring(data: Highlight): OffsetElem
     highlight(data: Highlight, {className: string}): void
     jumpToDefinition(data: Highlight): void
+
+    checkIsNextUsage (item: Highlight, currentPosition: Location): boolean
+    normalizeToAdapterFormat(data: Highlight) :Highlight
+    normalizeFromAdapterFormat(data: Highlight) :Highlight
 }

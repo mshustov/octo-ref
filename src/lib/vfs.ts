@@ -12,12 +12,10 @@ class VFS implements VFS{
     }
 
     addFile(filename, content) {
-        console.log('---ADD---', filename);
         this.cache[filename] = content;
     }
 
     removeFile(filename) {
-        console.log('---REMOVE---', filename);
         delete this.cache[filename];
     }
 

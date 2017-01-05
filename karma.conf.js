@@ -31,6 +31,10 @@ module.exports = function(config) {
                 base: 'Chrome',
                 flags: ['--no-sandbox']
             }
+        },
+        // https://github.com/webpack/karma-webpack/issues/188
+        mime: {
+            'text/x-typescript': ['ts','tsx']
         }
     });
 };

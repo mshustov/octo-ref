@@ -2,15 +2,10 @@
 import * as ts from 'typescript';
 import * as objectAssign from 'object-assign';
 
-import VFS from './vfs.ts';
+import VFS from './vfs';
 
-class Server{
-    vfs: VFS
-    ls: ts.LanguageService
-    linkCounter: { [key: string]: number }
-    constructor() {
-        this.vfs = new VFS();
-        const lsHost: ts.LanguageServiceHost = {
+const getLsHost = (vfs:VFS) : ts.LanguageServiceHost => {
+    const lsHost: ts.LanguageServiceHost = {
             getCompilationSettings : () => {
                 const options = ts.getDefaultCompilerOptions();
                 return objectAssign(options, {
@@ -20,9 +15,9 @@ class Server{
                     removeComments: false
                 });
             },
-            getScriptFileNames : () => this.vfs.getFileNames(),
+            getScriptFileNames : () => vfs.getFileNames(),
             getScriptSnapshot: (filename) => {
-                const content = this.vfs.getFile(filename);
+                const content = vfs.getFile(filename);
                 if(content) {
                     const snapshot = ts.ScriptSnapshot.fromString(content) as ts.IScriptSnapshot;
                     return snapshot;
@@ -36,38 +31,38 @@ class Server{
                 return ts.getDefaultLibFileName(options);
             }
         }
+
+    return lsHost;
+}
+
+class Server{
+    vfs: VFS
+    ls: ts.LanguageService
+    linkCounter: { [key: string]: number }
+    constructor() {
+        this.vfs = new VFS();
+        const lsHost: ts.LanguageServiceHost = getLsHost(this.vfs);
+
         this.ls = ts.createLanguageService(lsHost, ts.createDocumentRegistry());
         this.linkCounter = {};
     }
 
-    addFile(filename, content){
-        this.linkCounter[filename] = (this.linkCounter[filename] || 0) + 1;
-        this.vfs.addFile(filename, content);
-    }
+    getDefinition(filename, line, col, content){
+        this.vfs.addFile(filename, content); // kludge since sometimes browser reset content;
 
-    removeFile(filename){
-        this.linkCounter[filename] -= 1;
-        if (this.linkCounter[filename] === 0) {
-            this.vfs.removeFile(filename);
-        }
-    }
-
-    getDefinition(filename, line, col){
-        // line, col --> pos on github level
         const sourceFile = this.ls.getSourceFile(filename) as ts.SourceFile;
-        debugger;
-        const pos = ts.getPositionOfLineAndCharacter(sourceFile, line - 1, col - 1);
+        const pos = ts.getPositionOfLineAndCharacter(sourceFile, line, col);
         const highlights = this.ls.getDocumentHighlights(filename, pos, [filename]);
-        const result = highlights ? 
-            highlights[0].highlightSpans.map(({kind, textSpan}) => {
+        const result = highlights 
+            ? highlights[0].highlightSpans.map(({kind, textSpan}) => {
                 const {line, character} = ts.getLineAndCharacterOfPosition(this.ls.getSourceFile(filename), textSpan.start);
                 return {
                     kind,
-                    start: {line: line + 1, character}, // ts counts from 0?
+                    start: {line, character}, // ts counts from 0?
                     length: textSpan.length
                 }
-            }):
-            null;
+            })
+            : null;
         return result;
     }
 }

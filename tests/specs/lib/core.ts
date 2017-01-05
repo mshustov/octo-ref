@@ -1,5 +1,5 @@
 import OctoRef from '../../../src/lib/core';
-const config = require('../../../src/config.json');
+import config from '../../../src/config';
 
 import * as objectAssign from 'object-assign';
 import chai = require('chai');
@@ -45,23 +45,32 @@ describe('core', function(){
         OctoRef.prototype.send = spySend;
         var instance = new OctoRef(mockAdapter, config, pathname);
         instance.findDefinition();
+        // content: this.domAPI.getFileContent()
 
-        expect(spySend.calledWith('definition', { end: { line, character }, url: pathname })).to.be.ok;
+        expect(spySend.calledWith(
+            'definition',
+            {
+                end: { line, character },
+                url: pathname,
+                content: 'fileContent'
+            }
+        )).to.be.ok;
     });
 
-    it('#doHighlight', function() {
-        const shouldDo = {};
+    it('#highlight', function() {
+        const actionToDo = {};
         const currentPosition = {};
         const spyHighlight = sinon.spy();
 
         const mockAdapter = makeMockAdapter({
-            highlight: spyHighlight
+            highlight: spyHighlight,
+            normalizeToAdapterFormat: f => f
         })
 
         var instance = new OctoRef(mockAdapter, config, pathname);
 
         const data = {start: 'start', end: 'end'};
-        instance.doHighlight(shouldDo, [data], currentPosition); // FIXME
+        instance.highlight(actionToDo, [data], currentPosition); // FIXME
 
         expect(spyHighlight.calledOnce).to.be.ok;
         expect(spyHighlight.calledWith(data)).to.be.ok;

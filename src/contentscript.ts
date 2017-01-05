@@ -3,9 +3,8 @@ import OctoRef from './lib/core';
 import Styler from './lib/update-style';
 import syncer from './lib/sync-storage';
 import Adapter from './adapter/github';
-import { endsWith } from './lib/utils.ts';
-
-const config = require('./config.json');
+import { endsWith } from './lib/utils';
+import config from './config';
 
 const template = (selector, color) =>
     `.${selector}
@@ -39,7 +38,7 @@ injection(window, function() {
         if(instance){
             instance.removeHandlers();
         }
-        const adapter = new Adapter(window)
+        const adapter = new Adapter(window);
         instance = new OctoRef(adapter, config, window.location.pathname);
     }
 });
