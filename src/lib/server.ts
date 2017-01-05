@@ -50,12 +50,18 @@ class Server{
     getDefinition(filename, line, col, content){
         this.vfs.addFile(filename, content); // kludge since sometimes browser reset content;
 
-        const sourceFile = this.ls.getSourceFile(filename) as ts.SourceFile;
+        const sourceFile = ts.createSourceFile(filename, content, ts.ScriptTarget.Latest) as ts.SourceFile;
         const pos = ts.getPositionOfLineAndCharacter(sourceFile, line, col);
         const highlights = this.ls.getDocumentHighlights(filename, pos, [filename]);
+
+        // const result = null;
         const result = highlights 
             ? highlights[0].highlightSpans.map(({kind, textSpan}) => {
-                const {line, character} = ts.getLineAndCharacterOfPosition(this.ls.getSourceFile(filename), textSpan.start);
+                const {line, character} = ts.getLineAndCharacterOfPosition(
+                    // this.ls.getSourceFile(filename),
+                    sourceFile,
+                    textSpan.start
+                );
                 return {
                     kind,
                     start: {line, character}, // ts counts from 0?

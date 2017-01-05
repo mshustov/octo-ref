@@ -1,12 +1,12 @@
-/// <reference path="../../../typings/main.d.ts" />
 /// <reference path="../../../typings/specs.d.ts" />
-import Adapter from '../../../src/adapter/github';
-
-var adapter;
 
 import chai = require('chai');
 const expect = chai.expect;
 const assert = chai.assert;
+
+import Adapter from '../../../src/adapter/github';
+
+var adapter;
 
 describe('github api', function(){
     beforeEach(function() {

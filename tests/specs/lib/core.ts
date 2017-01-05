@@ -1,9 +1,10 @@
-import OctoRef from '../../../src/lib/core';
-import config from '../../../src/config';
-
+/// <reference path="../../../node_modules/@types/sinon/index.d.ts" />
 import * as objectAssign from 'object-assign';
 import chai = require('chai');
 const expect = chai.expect;
+
+import OctoRef from '../../../src/lib/core';
+import config from '../../../src/config';
 
 describe('core', function(){
     const pathname = 'http://url.com';
