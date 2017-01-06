@@ -9,7 +9,7 @@ import config from './config';
 const template = (selector, color) =>
     `.${selector}
     {
-        background-color: #${color};
+        background-color: ${color};
         pointer-events: none;
     }`
 

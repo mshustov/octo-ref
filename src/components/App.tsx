@@ -68,12 +68,12 @@ class App extends React.Component<{}, AppState> {
                     <span className="title">Scroll to definition</span>
                 </label>
                 <div className="row" onClick={ this.handleColorClick.bind(null, 'defColor') }>
-                    <span className="pallet" style={{backgroundColor: `#${defColor}`}} >
+                    <span className="pallet" style={{backgroundColor: defColor}} >
                         Definition color
                     </span>
                 </div>
                 <div className="row" onClick={ this.handleColorClick.bind(null, 'refColor') }>
-                    <span className="pallet" style={{backgroundColor: `#${refColor}`}} >
+                    <span className="pallet" style={{backgroundColor: refColor}} >
                         Reference color
                     </span>
                 </div>
