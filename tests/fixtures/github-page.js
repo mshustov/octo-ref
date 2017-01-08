@@ -26,3 +26,11 @@ greet = greet.bind(null, options);
 
 [1,2,3].map(i => i + 1 );
 
+let a = 0;
+/*
+another la jsdoc comment
+
+but with empty string
+*/
+
+a = Math.random() > 0.5 ? 1 : -1;
