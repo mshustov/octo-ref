@@ -1,10 +1,10 @@
 /// <reference path="../../typings/vendors.d.ts" />
 
-import { toArray } from '../lib/utils.ts';
+import { toArray } from '../lib/utils';
 
 const GITHUB = {
-    CONTAINER: 'blob-wrapper',
-    FILENAME: 'js-permalink-shortcut',
+    CONTAINER: '.blob-wrapper tbody',
+    FILENAME: '.js-permalink-shortcut',
     LINE: 'js-file-line',
     LINESHORT: 'LC',
     WRAPPER: 'text-wrapper-source'
@@ -17,7 +17,7 @@ const enum NODE {
 
 class GithubDomAPI implements GithubDomAPI {
     window: Window
-    root: HTMLElement
+    root: Element
     fileContent: string
     fileName: string
 
@@ -31,11 +31,19 @@ class GithubDomAPI implements GithubDomAPI {
 
     constructor(window) {
         this.window = window;
-        this.root = window.document.querySelector(`.${GITHUB.CONTAINER}`);
+        this.root = this.window.document.querySelector(GITHUB.CONTAINER);
 
-        this.fileContent = this.root.innerText;
-        const permalinkContainer = window.document.querySelector(`.${GITHUB.FILENAME}`);
+        this.fileContent = this.calcFileContent(this.root);
+        const permalinkContainer = this.window.document.querySelector(GITHUB.FILENAME);
         this.fileName = permalinkContainer.getAttribute('href');
+    }
+
+    calcFileContent(root){
+        return toArray(root.children)
+            .map(i => i.innerText)
+            // due to GH Markup we can't get \n for empty comment string, so we force empty string to \n
+            .map(str => str === '\n' ? '' : str)
+            .join('\n');
     }
 
     getRoot(){
@@ -65,7 +73,7 @@ class GithubDomAPI implements GithubDomAPI {
     clean(selectors){
         const selectorClasses = selectors.map((selector) => `.${selector}`);
         // we need intersection of many
-        const elems = this.window.document.querySelectorAll(selectorClasses);
+        const elems = this.root.querySelectorAll(selectorClasses);
         toArray(elems).forEach((elem) => {
             elem.classList.remove(...selectors);
             if (elem.classList.contains(GITHUB.WRAPPER)){
