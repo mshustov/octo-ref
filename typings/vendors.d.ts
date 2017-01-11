@@ -36,7 +36,7 @@ declare interface OctoRef {
 
 declare interface Syncer {
     getData(rule: string, cb: (data: any) => void): void
-    setData(any, cb: () => void): void
+    setData(rule: string, any, cb: () => void): void
     getDataSetDefault(rule: string, defaultValue: any, cb: (data: any) => void): void
     subscribe(rule: string, cb: (data: any) => void): void
 }

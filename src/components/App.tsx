@@ -41,7 +41,7 @@ class App extends React.Component<{}, AppState> {
 
     handleChange(prop, value){
         var newValue = objectAssign({}, this.state.data, { [prop]: value });
-        syncer.setData({octoRef: newValue}, () => this.setState({data: newValue}));
+        syncer.setData('octoRef', newValue, () => this.setState({data: newValue}));
     }
 
     render() {
