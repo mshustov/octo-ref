@@ -5,7 +5,7 @@ const syncer : Syncer = {
         chrome.storage.sync.get(rule, cb);
     },
 
-    setData(data, cb){
+    setData(data, cb?){
         chrome.storage.sync.set(data, cb);
     },
 

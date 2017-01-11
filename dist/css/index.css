@@ -1,24 +1,28 @@
-.container {
-    width: 260px;
-    font-size: 14px;
+.color {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.row {
-    display: flex;
-    margin: 5px 0;
+.color__text {
+  position: absolute;
+  pointer-events: none;
 }
 
-.pallet {
-    flex-grow: 1;
-    text-align: center;
-    cursor: pointer;
+.color__element {
+  height: 40px;
+  width: 120px;
+  
+  padding: 0;
+  border: 1px solid #000;
+  outline: none;
 }
 
-.title {
-    font-weight: bold;
-    margin-left: 5px;
+.color__element::-webkit-color-swatch-wrapper {
+  padding: 0;
 }
 
-.radio + .radio {
-    margin-left: 5px;
+.color__element::-webkit-color-swatch {
+  outline: none;
+  border: none;
 }
