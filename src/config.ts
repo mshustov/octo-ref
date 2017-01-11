@@ -1,9 +1,7 @@
 const config = {
     settings: {
         refColor: "ffee00",
-        defColor: "e6c8ec",
-        control: "alt",
-        scroll: false
+        defColor: "e6c8ec"
     },
     className: {
         source: "defColor",

@@ -2,8 +2,6 @@
 
 import * as React from 'react';
 import { CompactPicker } from 'react-color';
-import Radiogroup from './radiogroup';
-import Radio from './radio';
 import syncer from '../lib/sync-storage'
 import * as objectAssign from 'object-assign';
 
@@ -47,26 +45,9 @@ class App extends React.Component<{}, AppState> {
     }
 
     render() {
-        const {refColor, defColor, scroll, control} = this.state.data;
+        const {refColor, defColor} = this.state.data;
         return (
             <div className="container">
-                <div className="row">
-                    <Radiogroup
-                        name="typeClick"
-                        value={control}
-                        options={['alt', 'cmd']}
-                        onChange={(value)=> this.handleChange('control', value)}
-                    />
-                    <span className="title">+ click</span>
-                </div>
-                <label className="row">
-                    <input
-                        type="checkbox"
-                        checked={scroll}
-                        onClick={() => this.handleChange('scroll', !scroll) }
-                    />
-                    <span className="title">Scroll to definition</span>
-                </label>
                 <div className="row" onClick={ this.handleColorClick.bind(null, 'defColor') }>
                     <span className="pallet" style={{backgroundColor: defColor}} >
                         Definition color

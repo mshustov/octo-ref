@@ -192,7 +192,7 @@ class GithubDomAPI implements GithubDomAPI {
 
     highlight(data, options){
         const { elem, offset } = this._getDOMMappring(data);
-        const {scroll, className} = options;
+        const { className } = options;
 
         switch(elem.nodeType){
             case NODE.ELEMENT:
