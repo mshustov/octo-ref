@@ -183,7 +183,7 @@ class GithubDomAPI implements GithubDomAPI {
 
     private _getDOMMappring(data){
         const line = data.start.line;
-        const root = this.window.document.getElementById(`${GITHUB.LINESHORT}${line}`);  // FIXME hardcoded stuff
+        const root = this.window.document.getElementById(`${GITHUB.LINESHORT}${line}`);
         const { elem, offset } = this._iterateUnitlOffset(root, data.start.character)
         return { elem, offset };
     }
@@ -230,7 +230,7 @@ class GithubDomAPI implements GithubDomAPI {
     }
 
     checkIsNextUsage (item, currentPosition) {
-        // TODO think probably it should be thought over to reduce casting cases
+        // TODO probably it should be thought over to reduce casting cases
         const castedCurrentPosition = this.normalizeToAdapterFormat(currentPosition);
         const isNext = item.start.line > castedCurrentPosition.line || 
             (

@@ -1,6 +1,6 @@
 ///<reference path="../../typings/vendors.d.ts"/>
 
-class VFS implements VFS{
+class FileCache implements FileCache{
     cache: {[key: string]: string}
 
     constructor() {
@@ -24,4 +24,4 @@ class VFS implements VFS{
     }
 }
 
-export default VFS;
+export default FileCache;

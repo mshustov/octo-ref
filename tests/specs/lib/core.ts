@@ -13,8 +13,7 @@ describe('core', function(){
         subscribe: ()=> null,
         getFileContent: () => 'fileContent',
     }
-    const makeMockAdapter = (customProps = {}) =>
-            Object.assign({}, defMock, customProps)
+    const makeMockAdapter = (customProps = {}) => ({...defMock, ...customProps})
 
 
     it('constructor should create instance', function() {

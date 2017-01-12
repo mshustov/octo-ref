@@ -50,7 +50,7 @@ declare interface File {
     color: string
 }
 
-declare interface VFS {
+declare interface FileCache {
     cache: {[key: string]: string}
     getFileNames(): string[]
     addFile(filename: string, content: string): void // switch to File
@@ -85,8 +85,7 @@ interface OffsetElem {
 
 declare interface Server {
     constructor()
-    vfs: VFS
-    linkCounter: { [key: string]: number }
+    filecache: FileCache
     // ls: typescript.LanguageService
     addFile(filename: string, content: string): void
     removeFile(filename: string): void

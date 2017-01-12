@@ -1,11 +1,4 @@
 ///<reference path="../../typings/vendors.d.ts"/>
-// TODO: enum 
-// next logic:
-// alt  - highlight stuff
-// cmd  - highlight stuff + jump to definition
-// alt + cmd  - highlight stuff + jump to next usage
-// https://github.com/Microsoft/TypeScript/blob/32a9196354638400680897da5a8e0d6715440cae/lib/typescript.d.ts
-// https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API
 
 import { controlKey, keyCode } from './utils';
 
