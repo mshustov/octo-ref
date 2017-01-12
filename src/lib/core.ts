@@ -7,8 +7,6 @@
 // https://github.com/Microsoft/TypeScript/blob/32a9196354638400680897da5a8e0d6715440cae/lib/typescript.d.ts
 // https://github.com/Microsoft/TypeScript/wiki/Using-the-Compiler-API
 
-import * as objectAssign from 'object-assign';
-
 import { controlKey, keyCode } from './utils';
 
 class OctoRef{
@@ -110,7 +108,7 @@ class OctoRef{
     highlight(actionToDo, rawData, position){
         if (!rawData) return
 
-        const data = rawData.map(rawDataItem => objectAssign({}, rawDataItem, {
+        const data = rawData.map(rawDataItem => Object.assign({}, rawDataItem, {
             start: this.domAPI.normalizeToAdapterFormat(rawDataItem.start)
         }));
 

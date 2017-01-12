@@ -1,7 +1,5 @@
 /// <reference path="../../typings/vendors.d.ts" />
 
-import { toArray } from '../lib/utils';
-
 const GITHUB = {
     CONTAINER: '.blob-wrapper tbody',
     FILENAME: '.js-permalink-shortcut',
@@ -39,8 +37,8 @@ class GithubDomAPI implements GithubDomAPI {
     }
 
     calcFileContent(root){
-        return toArray(root.children)
-            .map(i => i.innerText)
+        return Array.from(root.children)
+            .map((i: HTMLElement): string => i.innerText)
             // due to GH Markup we can't get \n for empty comment string, so we force empty string to \n
             .map(str => str === '\n' ? '' : str)
             .join('\n');
@@ -74,7 +72,7 @@ class GithubDomAPI implements GithubDomAPI {
         const selectorClasses = selectors.map((selector) => `.${selector}`);
         // we need intersection of many
         const elems = this.root.querySelectorAll(selectorClasses);
-        toArray(elems).forEach((elem) => {
+        Array.from(elems).forEach((elem: HTMLElement): void => {
             elem.classList.remove(...selectors);
             if (elem.classList.contains(GITHUB.WRAPPER)){
                 elem.parentNode.replaceChild(elem.firstChild, elem);

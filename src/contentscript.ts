@@ -3,7 +3,6 @@ import OctoRef from './lib/core';
 import Styler from './lib/update-style';
 import syncer from './lib/sync-storage';
 import Adapter from './adapter/github';
-import { endsWith } from './lib/utils';
 import config from './config';
 
 const template = (selector, color) =>
@@ -29,7 +28,7 @@ const syncCallback = (data) => {
 syncer.getDataSetDefault('octoRef', config.settings, syncCallback);
 syncer.subscribe('octoRef', syncCallback)
 
-const isValidExtension = (str = '') => config.ext.some(endsWith.bind(null, str));
+const isValidExtension = (str = '') => config.ext.some(s => str.endsWith(s));
 
 let instance;
 injection(window, function() {

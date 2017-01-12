@@ -1,6 +1,5 @@
 // right now it's going to work only for a file
 import * as ts from 'typescript';
-import * as objectAssign from 'object-assign';
 
 import VFS from './vfs';
 
@@ -8,7 +7,7 @@ const getLsHost = (vfs:VFS) : ts.LanguageServiceHost => {
     const lsHost: ts.LanguageServiceHost = {
             getCompilationSettings : () => {
                 const options = ts.getDefaultCompilerOptions();
-                return objectAssign(options, {
+                return Object.assign(options, {
                     allowJs: true,
                     allowNonTsExtensions: true,
                     noResolve: true,

@@ -1,5 +1,4 @@
 /// <reference path="../../../node_modules/@types/sinon/index.d.ts" />
-import * as objectAssign from 'object-assign';
 import chai = require('chai');
 const expect = chai.expect;
 
@@ -15,7 +14,7 @@ describe('core', function(){
         getFileContent: () => 'fileContent',
     }
     const makeMockAdapter = (customProps = {}) =>
-            objectAssign({}, defMock, customProps)
+            Object.assign({}, defMock, customProps)
 
 
     it('constructor should create instance', function() {

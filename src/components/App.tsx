@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { CompactPicker } from 'react-color';
 import syncer from '../lib/sync-storage'
-import * as objectAssign from 'object-assign';
 
 interface AppState {
     displayColorPicker?: boolean,
@@ -21,7 +20,7 @@ class App extends React.Component<{}, AppState> {
         };
         this.handleColorClick = this.handleColorClick.bind(this);
         this.handleClose = this.handleClose.bind(this);
-        this.handleChange = this.handleChange.bind(this);
+        this.handleColorChange = this.handleColorChange.bind(this);
     }
 
     componentDidMount() {
@@ -39,8 +38,10 @@ class App extends React.Component<{}, AppState> {
         this.setState({ displayColorPicker: false });
     }
 
-    handleChange(prop, value){
-        var newValue = objectAssign({}, this.state.data, { [prop]: value });
+    handleColorChange(prop, value){
+        this.handleClose();
+
+        var newValue = Object.assign({}, this.state.data, { [prop]: value });
         syncer.setData('octoRef', newValue, () => this.setState({data: newValue}));
     }
 
@@ -62,7 +63,7 @@ class App extends React.Component<{}, AppState> {
                 <CompactPicker
                     color={this.state.data[this.state.currentType]}
                     position="below"
-                    onChange={(color) => { this.handleClose(); this.handleChange(this.state.currentType, color.hex) }}
+                    onChange={color => this.handleColorChange(this.state.currentType, color.hex)}
                     onClose={this.handleClose}
                 />
                 }
