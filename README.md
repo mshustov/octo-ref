@@ -24,5 +24,8 @@ First version works for source pages on github site only.
 ### Install
 drag'n'drop built file from /build folder to `chrome://extensions/`
 
+### Alternatives
+ - [Sourcegraph](https://chrome.google.com/webstore/detail/sourcegraph-for-github/dgjhfomjieaadpoljlnidmbgkdffpack?hl=en)
+
 ### License
 [WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-strip.jpg)
