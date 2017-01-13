@@ -1,5 +1,6 @@
 /// <reference path="../../../node_modules/@types/sinon/index.d.ts" />
-import chai = require('chai');
+import * as sinon from 'sinon';
+import * as chai from 'chai';
 const expect = chai.expect;
 
 import OctoRef from '../../../src/lib/core';

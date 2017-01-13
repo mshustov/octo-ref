@@ -22,7 +22,11 @@ First version works for source pages on github site only.
 - definition / reference highlight color
 
 ### Install
-drag'n'drop built file from /build folder to `chrome://extensions/`
+still under development, so you have to install it manually:
+- clone repo
+- `npm i`
+- `npm run build`
+- drag'n'drop built file from /build folder to `chrome://extensions/`
 
 ### Alternatives
  - [Sourcegraph](https://chrome.google.com/webstore/detail/sourcegraph-for-github/dgjhfomjieaadpoljlnidmbgkdffpack?hl=en)

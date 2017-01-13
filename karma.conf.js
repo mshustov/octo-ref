@@ -4,7 +4,7 @@ module.exports = function(config) {
     config.set({
         basePath: '',
         browsers:   process.env.TRAVIS ? ['Chrome_travis_ci'] : ['Chrome'],
-        frameworks: ['mocha', 'sinon-chai'],
+        frameworks: ['mocha'],
         files: [
             'tests/specs/**/*.ts',
             'tests/fixtures/*.html'

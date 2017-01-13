@@ -17,7 +17,6 @@ module.exports = {
     resolve: {
         extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js']
     },
-    watch: true,
     watchOptions: {
         aggregateTimeout: 100
     },
