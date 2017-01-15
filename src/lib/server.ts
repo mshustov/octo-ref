@@ -47,24 +47,28 @@ class Server{
     }
 
     getDefinition(filename, line, col, content){
-        this.filecache.addFile(filename, content); // kludge since sometimes browser reset content;
+        try{
+            this.filecache.addFile(filename, content); // kludge since sometimes browser reset content
 
-        const sourceFile = ts.createSourceFile(filename, content, ts.ScriptTarget.Latest) as ts.SourceFile;
-        const pos = ts.getPositionOfLineAndCharacter(sourceFile, line, col);
-        const highlights = this.ls.getDocumentHighlights(filename, pos, [filename]);
+            const sourceFile = ts.createSourceFile(filename, content, ts.ScriptTarget.Latest) as ts.SourceFile;
+            const pos = ts.getPositionOfLineAndCharacter(sourceFile, line, col);
+            const highlights = this.ls.getDocumentHighlights(filename, pos, [filename]);
 
-        if(!highlights){
-            return null;
-        }
-
-        return highlights[0].highlightSpans.map(({kind, textSpan}) => {
-            const {line, character} = ts.getLineAndCharacterOfPosition(sourceFile, textSpan.start);
-            return {
-                kind,
-                start: {line, character},
-                length: textSpan.length
+            if(!highlights){
+                return null;
             }
-        });
+
+            return highlights[0].highlightSpans.map(({kind, textSpan}) => {
+                const {line, character} = ts.getLineAndCharacterOfPosition(sourceFile, textSpan.start);
+                return {
+                    kind,
+                    start: {line, character},
+                    length: textSpan.length
+                }
+            });
+        } finally {
+            this.filecache.removeFile(filename);
+        }
     }
 }
 
