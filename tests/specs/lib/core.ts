@@ -29,7 +29,6 @@ describe('core', function(){
         new OctoRef(mockAdapter, config, pathname);
 
         expect(spySubscribe.calledWith('click')).to.be.ok;
-        expect(spySend.calledWith('register', { content: 'fileContent', url: pathname })).to.be.ok;
     });
 
     it('#findDefinition ', function() {

@@ -24,13 +24,6 @@ class OctoRef{
             this.handleKeyup = this.handleKeyup.bind(this);
 
             this.addHandlers();
-            this.send('register',
-                {
-                    content: this.domAPI.getFileContent(),
-                    url: this.url
-                },
-                (err, status) => console.log(status)
-            );
         }
     }
 
@@ -85,6 +78,8 @@ class OctoRef{
             {
                 end: position,
                 url,
+                // we used to cache content and didn't send it every time
+                // but sometimes chrome restarts and we could lose data
                 content: this.domAPI.getFileContent()
             },
             (data) => {
