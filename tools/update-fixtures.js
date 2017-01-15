@@ -14,5 +14,7 @@ Object.keys(url2file).forEach(function(fn){
         var $ = cheerio.load(body);
         var content = $('body');
         fs.writeFileSync(path.resolve('./tests/fixtures/', fn + '.html'), content);
+
+        console.log(fn, 'was updated sucessfully');
     });
 })
