@@ -9,7 +9,6 @@ import config from './config';
 const styler = new Styler(template);
 
 const syncCallback = (data) => {
-    config.settings = data;
     const { defColor, refColor } = data;
 
     styler.removeRules();

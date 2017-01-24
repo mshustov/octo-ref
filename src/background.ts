@@ -4,9 +4,8 @@ import config from './config';
 
 (function ensureSettings(rule, defaultValue){
     syncer.getData(rule, (data) => {
-        let value = data[rule];
-        if(!value) {
-            syncer.setData('rule', defaultValue);
+        if(!data) {
+            syncer.setData(rule, defaultValue);
         }
     });
 })('octoRef', config.settings);
