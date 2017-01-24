@@ -1,4 +1,16 @@
 import Server from './lib/server';
+import syncer from './lib/sync-storage';
+import config from './config';
+
+(function ensureSettings(rule, defaultValue){
+    syncer.getData(rule, (data) => {
+        let value = data[rule];
+        if(!value) {
+            syncer.setData('rule', defaultValue);
+        }
+    });
+})('octoRef', config.settings);
+
 const server = new Server();
 
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
