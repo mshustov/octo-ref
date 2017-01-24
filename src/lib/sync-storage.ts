@@ -1,24 +1,15 @@
 ///<reference path="../../typings/vendors.d.ts"/>
 
 const syncer : Syncer = {
+    remove(rule){
+        chrome.storage.sync.remove(rule);
+    },
     getData(rule, cb){
-        chrome.storage.sync.get(rule, cb);
+        chrome.storage.sync.get(rule, (data) => cb(data[rule]));
     },
 
     setData(rule, data, cb){
         chrome.storage.sync.set({ [rule]: data }, cb);
-    },
-
-    getDataSetDefault(rule, defaultValue, cb){
-        // chrome.storage.sync.remove(rule);
-        this.getData(rule, (data) => {
-            let value = data[rule];
-            if(!value) {
-                value = defaultValue;
-                this.setData({[rule]: value}, cb);
-            }
-            cb(value);
-        });
     },
 
     subscribe(rule, cb) {

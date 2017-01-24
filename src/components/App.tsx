@@ -24,7 +24,7 @@ class App extends React.Component<{}, AppState> {
     }
 
     componentDidMount() {
-        syncer.getData('octoRef', (data) => this.setState({ data: data.octoRef }));
+        syncer.getData('octoRef', (data) => this.setState({ data }));
     }
 
     handleColorClick(type) {

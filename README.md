@@ -10,8 +10,8 @@ Extension supports `js`, `ts`, `jsx`, `es6` files.
 
 Make available next hot keys:
 - `alt + click` - just highlight
-- `cmd + click` - jump to next usage place
-- `alt + cmd + click` - jump to definition
+- `ctrl + click` | `cmd + click`(Mac) - jump to next usage place
+- `alt + ctrl + click` | `alt + cmd + click`(Mac) - jump to definition
 - `esc` - clean highlightes
 
 First version works for source pages on github site only.

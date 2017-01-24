@@ -1,7 +1,7 @@
 const config = {
     settings: {
-        refColor: "ffee00",
-        defColor: "e6c8ec"
+        refColor: "#ffee00",
+        defColor: "#e6c8ec"
     },
     className: {
         source: "defColor",
