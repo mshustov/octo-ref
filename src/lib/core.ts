@@ -1,5 +1,3 @@
-///<reference path="../../typings/vendors.d.ts"/>
-
 import { controlKey, keyCode } from './utils';
 
 class OctoRef{

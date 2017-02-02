@@ -1,5 +1,3 @@
-/// <reference path="../../typings/vendors.d.ts" />
-
 import * as React from 'react';
 import { CompactPicker } from 'react-color';
 import syncer from '../lib/sync-storage'

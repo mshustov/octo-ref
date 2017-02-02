@@ -1,5 +1,3 @@
-///<reference path="../../typings/vendors.d.ts"/>
-
 class Styler implements Styler {
     sheet: CSSStyleSheet
     getTemplate: GetTemplate

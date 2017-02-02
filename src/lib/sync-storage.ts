@@ -1,5 +1,3 @@
-///<reference path="../../typings/vendors.d.ts"/>
-
 const syncer : Syncer = {
     remove(rule){
         chrome.storage.sync.remove(rule);

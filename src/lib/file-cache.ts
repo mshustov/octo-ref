@@ -1,5 +1,3 @@
-///<reference path="../../typings/vendors.d.ts"/>
-
 class FileCache implements FileCache{
     cache: {[key: string]: string}
 

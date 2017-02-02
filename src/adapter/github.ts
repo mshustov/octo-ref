@@ -1,5 +1,3 @@
-/// <reference path="../../typings/vendors.d.ts" />
-
 const GITHUB = {
     CONTAINER: '.blob-wrapper tbody',
     FILENAME: '.js-permalink-shortcut',
