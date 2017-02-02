@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { CompactPicker } from 'react-color';
 import syncer from '../lib/sync-storage'
+import { controls } from '../lib/utils';
 
 interface AppState {
     displayColorPicker?: boolean,
@@ -47,6 +48,11 @@ class App extends React.Component<{}, AppState> {
         const {refColor, defColor} = this.state.data;
         return (
             <div className="container">
+                <div>
+                    <div><b>{controls.highlight.name} + Click</b> - highlight</div>
+                    <div><b>{controls.jump.name} + Click</b> - jump to next usage place</div>
+                    <div><b>{`${controls.highlight.name} + ${controls.jump.name}`} + Click</b> - jump to definition</div>
+                </div>
                 <div className="row" onClick={ this.handleColorClick.bind(null, 'defColor') }>
                     <span className="pallet" style={{backgroundColor: defColor}} >
                         Definition color

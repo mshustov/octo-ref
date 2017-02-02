@@ -1,4 +1,4 @@
-import { controlKey, keyCode } from './utils';
+import { controls, keyCode } from './utils';
 
 class OctoRef{
     url: string
@@ -43,9 +43,9 @@ class OctoRef{
 
     getDesiredActions(e){
         return {
-            highlightOnly: e[controlKey.alt],
-            jumpToNextUsage: e[controlKey.cmd] && !e[controlKey.alt],
-            jumpToDefinition: e[controlKey.cmd] && e[controlKey.alt]
+            highlightOnly: e[controls.highlight.value],
+            jumpToNextUsage: e[controls.jump.value] && !e[controls.highlight.value],
+            jumpToDefinition: e[controls.jump.value] && e[controls.highlight.value]
         }
     }
 
