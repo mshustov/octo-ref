@@ -13,10 +13,14 @@ jest.setTimeout(1000000);
 describe('unit tests', function() {
     beforeEach(async function() {
         browser = await puppeteer.launch({
-            devtools: true,
-            headless: false,
-            // slowMo: 250, for debug purposes
+            // devtools: true,
+            headless: true,
+            // slowMo: 250, // for debug purposes
             args: [
+                // TODO add them for Travis only
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+
                 `--window-size=${width},${height}`,
                 // '--disable-extensions-except=dist/',
                 // '--load-extension=dist/',
@@ -31,8 +35,8 @@ describe('unit tests', function() {
         page.addScriptTag({
             content: scriptFile
         });
-        // some artifical delay to initialize script 
-        await page.waitFor(2500)
+        // some artificial delay to initialize script 
+        await page.waitFor(3500)
     });
 
     afterEach(() => {
@@ -40,8 +44,9 @@ describe('unit tests', function() {
     });
 
     describe('github api', function() {
-        it('#getRoot should return root html element', async function() {
+        it.only('#getRoot should return root html element', async function() {
             function extractItems() {
+                debugger
                 const root = window.adapter.getRoot()
                 return root instanceof HTMLElement
             }
