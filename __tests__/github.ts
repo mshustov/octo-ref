@@ -14,7 +14,7 @@ describe('unit tests', function() {
     beforeEach(async function() {
         browser = await puppeteer.launch({
             // devtools: true,
-            headless: true,
+            headless: false,
             // slowMo: 250, // for debug purposes
             args: [
                 // TODO add them for Travis only
