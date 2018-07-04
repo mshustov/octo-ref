@@ -1,20 +1,20 @@
 {
-    "version": "1.8.0",
-    "compilerOptions": {
-        "outDir": "build/js",
-        "target": "es6",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "noImplicitAny": false,
-        "jsx": "React",
-        "allowJs": true
-    },
-    "exclude": [
-        "build",
-        "node_modules",
-        "promise",
-        "typings/browser.d.ts",
-        "typings/browser"
-    ]
+  "compilerOptions": {
+    "outDir": "build/js",
+    "target": "es2017",
+    "lib": ["es2017", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "jsx": "React",
+    "allowJs": true
+  },
+  "exclude": [
+    "build",
+    "node_modules",
+    "promise",
+    "typings/browser.d.ts",
+    "typings/browser"
+  ]
 }

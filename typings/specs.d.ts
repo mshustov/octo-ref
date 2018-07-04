@@ -1,1 +1,1 @@
-interface Window { __html__: any; }
+interface Window { adapter: GithubDomAPI; }

@@ -1,10 +1,10 @@
 var path = require('path');
-var failPlugin = require('webpack-fail-plugin');
 var webpack = require('webpack');
 
 module.exports = {
-    target: 'node',
+    target: 'node', // 'web'
     context: __dirname,
+    mode: 'development', // TODO add prod build + uglify
     entry: {
         background: './src/background.ts',
         contentscript: './src/contentscript.ts',
@@ -15,25 +15,17 @@ module.exports = {
         filename: '[name].js'
     },
     resolve: {
-        extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js']
-    },
-    watchOptions: {
-        aggregateTimeout: 100
+        extensions: ['.ts', '.tsx', '.js']
     },
     devtool: 'inline-source-map',
     module: {
-        loaders: [{
-            test: /\.json$/,
-            loader: 'json'
-        }, {
+        rules: [{
             test: /\.(tsx?|js)$/,
             exclude: /(node_modules)/,
-            loader: 'ts-loader'
-        }],
-        noParse: [/typescript/]
+            use: 'ts-loader'
+        }]
     },
      plugins: [
-        failPlugin,
         // new webpack.NoErrorsPlugin(),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)

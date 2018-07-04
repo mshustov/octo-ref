@@ -1,17 +1,19 @@
 import { controls, keyCode } from './utils';
-
-class OctoRef{
+class OctoRef {
     url: string
     domAPI: GithubDomAPI
+    server: Server
     config: any
     // NOTE: could be update to TS 2.x
     static isDefinition(item: Highlight): boolean {
         return item.kind === 'writtenReference';
     }
 
-    constructor(adapter, config, url){
+    // TODO  make server lazy?
+    constructor(adapter, createServer, config, url){
         this.domAPI = adapter;
         if(this.domAPI.isCodePage()){
+            this.server = createServer()
             this.config = config;
             this.url = url;
             this.findDefinition= this.findDefinition.bind(this);
@@ -42,10 +44,11 @@ class OctoRef{
     }
 
     getDesiredActions(e){
+        // TODO create as a type to test in tests for example
         return {
-            highlightOnly: e[controls.highlight.value],
-            jumpToNextUsage: e[controls.jump.value] && !e[controls.highlight.value],
-            jumpToDefinition: e[controls.jump.value] && e[controls.highlight.value]
+            highlightOnly: Boolean(e[controls.highlight.value]),
+            jumpToNextUsage: Boolean(e[controls.jump.value] && !e[controls.highlight.value]),
+            jumpToDefinition: Boolean(e[controls.jump.value] && e[controls.highlight.value])
         }
     }
 
@@ -72,24 +75,30 @@ class OctoRef{
     findDefinition(actionToDo = {}){
         const position = this.domAPI.getSelectedElemPosition();
         const url = this.url;
-        this.send('definition',
-            {
-                end: position,
-                url,
-                // we used to cache content and didn't send it every time
-                // but sometimes chrome restarts and we could lose data
-                content: this.domAPI.getFileContent()
-            },
-            (data) => {
-                this.highlight(actionToDo, data, position);
-            }
-        );
+        const content = this.domAPI.getFileContent()
+        const {line, character} = position;
+
+        const response = this.server.getDefinition(url, line, character, content);
+
+        this.highlight(actionToDo, response, position);
+        // this.send('definition',
+        //     {
+        //         end: position,
+        //         url,
+        //         // we used to cache content and didn't send it every time
+        //         // but sometimes chrome restarts and we could lose data
+        //         content: this.domAPI.getFileContent()
+        //     },
+        //     (data) => {
+        //         this.highlight(actionToDo, data, position);
+        //     }
+        // );
     }
 
-    send(cmd, data, cb){
-        // CHECKME: we should add extensionId, when we get it)
-        chrome.runtime.sendMessage({ cmd, data }, cb);
-    }
+    // send(cmd, data, cb){
+    //     // CHECKME: we should add extensionId, when we get it)
+    //     chrome.runtime.sendMessage('ohmmdeimnfadblenffiiheeegbgddpok', { cmd, data }, cb);
+    // }
 
     highlight(actionToDo, rawData, position){
         if (!rawData) return
@@ -99,8 +108,8 @@ class OctoRef{
         }));
 
         data.forEach((highlight) => {
-            const isForDefiniton = OctoRef.isDefinition(highlight);
-            const className = this.config.getClassName(isForDefiniton);
+            const isForDefinition = OctoRef.isDefinition(highlight);
+            const className = this.config.getClassName(isForDefinition);
 
             this.domAPI.highlight( highlight, { className });
         })

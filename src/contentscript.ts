@@ -4,6 +4,7 @@ import Styler from './lib/update-style';
 import template from './lib/template';
 import syncer from './lib/sync-storage';
 import Adapter from './adapter/github';
+import Server from './lib/server';
 import config from './config';
 
 const styler = new Styler(template);
@@ -14,9 +15,9 @@ const syncCallback = (data) => {
     styler.removeRules();
     styler.updateStyle({refColor, defColor});
 }
-
-syncer.getData('octoRef', syncCallback);
-syncer.subscribe('octoRef', syncCallback)
+// TODO add is available?
+// syncer.getData('octoRef', syncCallback);
+// syncer.subscribe('octoRef', syncCallback)
 
 const isValidExtension = (str = '') => config.ext.some(s => str.endsWith(s));
 
@@ -28,7 +29,7 @@ injection(window, function() {
             instance.removeHandlers();
         }
         const adapter = new Adapter(window);
-        instance = new OctoRef(adapter, config, window.location.pathname);
+        instance = new OctoRef(adapter, () => new Server, config, window.location.pathname);
     }
 });
 
