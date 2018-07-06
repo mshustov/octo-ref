@@ -10,16 +10,20 @@ const width = 1400;
 const height = 1200;
 jest.setTimeout(1000000);
 
+const isCI = process.env.CI
+const isLocal = !isCI
+
 describe('unit tests', function() {
     beforeEach(async function() {
         browser = await puppeteer.launch({
-            // devtools: true,
-            headless: false,
-            // slowMo: 250, // for debug purposes
+            devtools: isLocal,
+            headless: !isLocal,
+            slowMo: isLocal ? 250 : 0,
             args: [
-                // TODO add them for Travis only
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
+                ...(isLocal ?
+                    []:
+                    ['--no-sandbox', '--disable-setuid-sandbox']
+                ),
 
                 `--window-size=${width},${height}`,
                 // '--disable-extensions-except=dist/',
@@ -35,7 +39,7 @@ describe('unit tests', function() {
         page.addScriptTag({
             content: scriptFile
         });
-        // some artificial delay to initialize script 
+        // some artificial delay to wait for injected script to initialize
         await page.waitFor(10000)
     });
 
