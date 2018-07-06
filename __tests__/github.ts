@@ -17,6 +17,7 @@ describe('unit tests', function() {
     beforeEach(async function() {
         browser = await puppeteer.launch({
             devtools: isLocal,
+            // travis doesn't support to run chrome in headful mode, but extension testing is available only in headful mode
             headless: !isLocal,
             slowMo: isLocal ? 250 : 0,
             args: [
@@ -26,8 +27,8 @@ describe('unit tests', function() {
                 ),
 
                 `--window-size=${width},${height}`,
-                // '--disable-extensions-except=dist/',
-                // '--load-extension=dist/',
+                '--disable-extensions-except=dist/',
+                '--load-extension=dist/',
             ]
         });
         page = await browser.newPage();
@@ -40,7 +41,7 @@ describe('unit tests', function() {
             content: scriptFile
         });
         // some artificial delay to wait for injected script to initialize
-        await page.waitFor(10000)
+        await page.waitFor(20000)
     });
 
     afterEach(() => {

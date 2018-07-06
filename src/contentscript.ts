@@ -2,7 +2,7 @@ import * as injection from 'github-injection';
 import OctoRef from './lib/core';
 import Styler from './lib/update-style';
 import template from './lib/template';
-// import syncer from './lib/sync-storage';
+import syncer from './lib/sync-storage';
 import Adapter from './adapter/github';
 import Server from './lib/server';
 import config from './config';
@@ -16,8 +16,8 @@ const syncCallback = (data) => {
     styler.updateStyle({refColor, defColor});
 }
 // TODO add is available?
-// syncer.getData('octoRef', syncCallback);
-// syncer.subscribe('octoRef', syncCallback)
+syncer.getData('octoRef', syncCallback);
+syncer.subscribe('octoRef', syncCallback)
 
 const isValidExtension = (str = '') => config.ext.some(s => str.endsWith(s));
 
