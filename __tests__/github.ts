@@ -36,7 +36,7 @@ describe('unit tests', function() {
             content: scriptFile
         });
         // some artificial delay to initialize script 
-        await page.waitFor(3500)
+        await page.waitFor(10000)
     });
 
     afterEach(() => {
@@ -44,9 +44,9 @@ describe('unit tests', function() {
     });
 
     describe('github api', function() {
-        it.only('#getRoot should return root html element', async function() {
+        it('#getRoot should return root html element', async function() {
             function extractItems() {
-                debugger
+                console.log('test', window.adapter)
                 const root = window.adapter.getRoot()
                 return root instanceof HTMLElement
             }
