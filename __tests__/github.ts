@@ -2,7 +2,7 @@ import * as puppeteer from 'puppeteer';
 import * as fs from 'fs'
 
 const pageUrl = 'https://github.com/restrry/octo-ref/blob/master/tests/fixtures/github-page.js';
-const scriptFile = fs.readFileSync('./dist/js/contentscript.js', 'utf8')
+// const scriptFile = fs.readFileSync('./dist/js/contentscript.js', 'utf8')
 let browser
 let page
 
@@ -12,7 +12,8 @@ jest.setTimeout(1000000);
 
 const isCI = process.env.CI
 const isLocal = !isCI
-
+const logError = (err) => 'error on page: ' + err
+const logConsole = msg => console.log(msg.text())
 describe('unit tests', function() {
     beforeEach(async function() {
         browser = await puppeteer.launch({
@@ -35,6 +36,9 @@ describe('unit tests', function() {
             ]
         });
         page = await browser.newPage();
+        page.on('error', logError);
+        page.on('pageerror', logError);
+        page.on('console', logConsole);
         await page.setViewport({ width, height });
 
         // we want to inject our script on the page, so we disable CSP
@@ -48,6 +52,9 @@ describe('unit tests', function() {
     });
 
     afterEach(() => {
+        page.removeListener('error', logError);
+        page.removeListener('pageerror', logError);
+        page.removeListener('console', logConsole);
         browser.close();
     });
 
