@@ -2,9 +2,9 @@ class Styler implements Styler {
     sheet: CSSStyleSheet
     getTemplate: GetTemplate
     constructor(getTemplate){
-        const style = document.createElement('style') as HTMLStyleElement;
-        style.appendChild(document.createTextNode(''));
-        document.head.appendChild(style);
+        const style = window.document.createElement('style') as HTMLStyleElement;
+        style.appendChild(window.document.createTextNode(''));
+        window.document.head.appendChild(style);
         this.sheet = style.sheet as CSSStyleSheet;
         this.getTemplate = getTemplate;
     }
