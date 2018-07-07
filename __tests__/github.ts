@@ -16,16 +16,17 @@ const isLocal = !isCI
 describe('unit tests', function() {
     beforeEach(async function() {
         browser = await puppeteer.launch({
-            devtools: isLocal,
+            // devtools: false,
             // travis doesn't support to run chrome in headful mode, but extension testing is available only in headful mode
-            headless: !isLocal,
-            slowMo: isLocal ? 250 : 0,
+            headless: false,
+            slowMo: 0,
             args: [
-                ...(isLocal ?
-                    []:
-                    ['--no-sandbox', '--disable-setuid-sandbox']
-                ),
-
+                // ...(isLocal ?
+                //     []:
+                //     []
+                // ),
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
                 '--disable-gpu',
                 `--window-size=${width},${height}`,
                 '--disable-extensions-except=dist/',
@@ -242,7 +243,7 @@ describe('unit tests', function() {
             });
         });
     });
-    describe('integration tests', function() {
+    describe.only('integration tests', function() {
         it('Highlight definition with Alt + Click combination', async function() {
 
             await page.keyboard.down('Alt');
