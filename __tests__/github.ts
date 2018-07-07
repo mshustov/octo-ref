@@ -50,7 +50,7 @@ describe('unit tests', function() {
     });
 
     describe('github api', function() {
-        it.only('#getRoot should return root html element', async function() {
+        it('#getRoot should return root html element', async function() {
             function extractItems() {
                 console.log('test', window.adapter)
                 const root = window.adapter.getRoot()
