@@ -38,9 +38,9 @@ describe('unit tests', function() {
         // we want to inject our script on the page, so we disable CSP
         await page.setBypassCSP(true);
         await page.goto(pageUrl);
-        page.addScriptTag({
-            content: scriptFile
-        });
+        // page.addScriptTag({
+        //     content: scriptFile
+        // });
         // some artificial delay to wait for injected script to initialize
         await page.waitFor(20000)
     });
