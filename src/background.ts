@@ -9,7 +9,6 @@ import Server from './lib/server';
         }
     });
 })('octoRef', config.settings);
-console.log('>>> background');
 const server = new Server();
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
     const { url, content } = request.data; // NOTE: sender.url !== window.location.url
@@ -20,7 +19,7 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
             const {line, character} = request.data.end;
 
             const result = server.getDefinition(url, line, character, content);
-            callback(result);
+            callback('from backgrounds');
             break;
 
         default:

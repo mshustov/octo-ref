@@ -17,7 +17,7 @@ const logConsole = msg => console.log(msg.text())
 describe('unit tests', function() {
     beforeEach(async function() {
         browser = await puppeteer.launch({
-            devtools: true,
+            // devtools: true,
             // travis doesn't support to run chrome in headful mode, but extension testing is available only in headful mode
             headless: false,
             slowMo: 0,
@@ -253,7 +253,6 @@ describe('unit tests', function() {
     });
     describe.only('integration tests', function() {
         it('Highlight definition with Alt + Click combination', async function() {
-            await page.waitFor(20000)
             await page.keyboard.down('Alt');
             await page.click('#LC13 > .pl-smi');
             await page.keyboard.up('Alt');
@@ -268,7 +267,6 @@ describe('unit tests', function() {
             expect(definitionIsFound).toBe(true);
         });
         it('Highlight definition and references with Alt + Click combination', async function() {
-            await page.waitFor(20000)
             await page.keyboard.down('Alt');
             await page.click('#LC21 > .pl-smi');
             await page.keyboard.up('Alt');
