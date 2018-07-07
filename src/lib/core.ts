@@ -71,7 +71,6 @@ class OctoRef {
     }
 
     findDefinition(actionToDo = {}){
-        console.log('>>> findDefinition');
         const position = this.domAPI.getSelectedElemPosition();
         const url = this.url;
         const content = this.domAPI.getFileContent()
@@ -80,6 +79,8 @@ class OctoRef {
         // const response = this.server.getDefinition(url, line, character, content);
 
         // this.highlight(actionToDo, response, position);
+        console.log('>>> findDefinition', url, JSON.stringify(position), this.domAPI.getFileContent());
+        debugger
         this.send('definition',
             {
                 end: position,
@@ -89,7 +90,7 @@ class OctoRef {
                 content: this.domAPI.getFileContent()
             },
             (data) => {
-                console.log('>>> send cb', JSON.stringify(data));
+                console.log('>>> send cb', String(data), JSON.stringify(data));
                 this.highlight(actionToDo, data, position);
             }
         );
