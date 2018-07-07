@@ -32,6 +32,6 @@ injection(window, function() {
     }
 });
 
-syncer.getData('octoRef', syncCallback);
-syncer.subscribe('octoRef', syncCallback) //syncCallback
+syncer.getData('octoRef', ()=>null);
+syncer.subscribe('octoRef', ()=>null) //syncCallback
 
