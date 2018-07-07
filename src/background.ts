@@ -1,5 +1,6 @@
 import syncer from './lib/sync-storage';
 import config from './config';
+import Server from './lib/server';
 
 (function ensureSettings(rule, defaultValue){
     syncer.getData(rule, (data) => {
@@ -9,7 +10,7 @@ import config from './config';
     });
 })('octoRef', config.settings);
 
-
+const server = new Server();
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
     const { url, content } = request.data; // NOTE: sender.url !== window.location.url
 
@@ -17,8 +18,8 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
 
         case 'definition':
             const {line, character} = request.data.end;
-            // const result = server.getDefinition(url, line, character, content);
-            // callback(result);
+            const result = server.getDefinition(url, line, character, content);
+            callback(result);
             break;
 
         default:

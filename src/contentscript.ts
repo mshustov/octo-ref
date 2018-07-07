@@ -4,7 +4,7 @@ import Styler from './lib/update-style';
 import template from './lib/template';
 import syncer from './lib/sync-storage';
 import Adapter from './adapter/github';
-import Server from './lib/server';
+// import Server from './lib/server';
 import config from './config';
 
 const styler = new Styler(template);
@@ -28,7 +28,7 @@ injection(window, function() {
             instance.removeHandlers();
         }
         const adapter = new Adapter(window);
-        instance = new OctoRef(adapter, () => new Server, config, window.location.pathname);
+        instance = new OctoRef(adapter, config, window.location.pathname);
     }
 });
 

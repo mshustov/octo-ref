@@ -2,7 +2,6 @@ import { controls, keyCode } from './utils';
 class OctoRef {
     url: string
     domAPI: GithubDomAPI
-    server: Server
     config: any
     // NOTE: could be update to TS 2.x
     static isDefinition(item: Highlight): boolean {
@@ -10,10 +9,9 @@ class OctoRef {
     }
 
     // TODO  make server lazy?
-    constructor(adapter, createServer, config, url){
+    constructor(adapter, config, url){
         this.domAPI = adapter;
         if(this.domAPI.isCodePage()){
-            this.server = createServer()
             this.config = config;
             this.url = url;
             this.findDefinition= this.findDefinition.bind(this);
@@ -78,27 +76,27 @@ class OctoRef {
         const content = this.domAPI.getFileContent()
         const {line, character} = position;
 
-        const response = this.server.getDefinition(url, line, character, content);
+        // const response = this.server.getDefinition(url, line, character, content);
 
-        this.highlight(actionToDo, response, position);
-        // this.send('definition',
-        //     {
-        //         end: position,
-        //         url,
-        //         // we used to cache content and didn't send it every time
-        //         // but sometimes chrome restarts and we could lose data
-        //         content: this.domAPI.getFileContent()
-        //     },
-        //     (data) => {
-        //         this.highlight(actionToDo, data, position);
-        //     }
-        // );
+        // this.highlight(actionToDo, response, position);
+        this.send('definition',
+            {
+                end: position,
+                url,
+                // we used to cache content and didn't send it every time
+                // but sometimes chrome restarts and we could lose data
+                content: this.domAPI.getFileContent()
+            },
+            (data) => {
+                this.highlight(actionToDo, data, position);
+            }
+        );
     }
 
-    // send(cmd, data, cb){
-    //     // CHECKME: we should add extensionId, when we get it)
-    //     chrome.runtime.sendMessage('ohmmdeimnfadblenffiiheeegbgddpok', { cmd, data }, cb);
-    // }
+    send(cmd, data, cb){
+        // CHECKME: we should add extensionId, when we get it)
+        chrome.runtime.sendMessage('ohmmdeimnfadblenffiiheeegbgddpok', { cmd, data }, cb);
+    }
 
     highlight(actionToDo, rawData, position){
         if (!rawData) return
