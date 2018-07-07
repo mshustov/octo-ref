@@ -29,8 +29,9 @@ describe('unit tests', function() {
                 '--disable-setuid-sandbox',
                 '--disable-gpu',
                 `--window-size=${width},${height}`,
-                '--disable-extensions-except=dist/',
-                '--load-extension=dist/',
+                '--disable-extensions-except=./dist/',
+                '--load-extension=./dist/',
+                '--user-agent=PuppeteerAgent'
             ]
         });
         page = await browser.newPage();
