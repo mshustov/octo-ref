@@ -28,7 +28,6 @@ class GithubDomAPI implements GithubDomAPI {
     constructor(window) {
         this.window = window;
         window.adapter = this;
-        console.log('window.adapter', window.adapter);
         this.root = this.window.document.querySelector(GITHUB.CONTAINER);
 
         this.fileContent = this.calcFileContent(this.root);

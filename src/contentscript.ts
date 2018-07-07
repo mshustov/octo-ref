@@ -15,8 +15,6 @@ const syncCallback = (data) => {
     styler.removeRules();
     styler.updateStyle({refColor, defColor});
 }
-console.log('syncer', syncer)
-// TODO add is available?
 
 const isValidExtension = (str = '') => config.ext.some(s => str.endsWith(s));
 

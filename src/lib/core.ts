@@ -71,6 +71,7 @@ class OctoRef {
     }
 
     findDefinition(actionToDo = {}){
+        console.log('>>> findDefinition');
         const position = this.domAPI.getSelectedElemPosition();
         const url = this.url;
         const content = this.domAPI.getFileContent()
@@ -88,12 +89,14 @@ class OctoRef {
                 content: this.domAPI.getFileContent()
             },
             (data) => {
+                console.log('>>> send cb', JSON.stringify(data));
                 this.highlight(actionToDo, data, position);
             }
         );
     }
 
     send(cmd, data, cb){
+        console.log('>>> send');
         // CHECKME: we should add extensionId, when we get it)
         chrome.runtime.sendMessage('ohmmdeimnfadblenffiiheeegbgddpok', { cmd, data }, cb);
     }
