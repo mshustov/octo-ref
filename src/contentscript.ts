@@ -29,7 +29,9 @@ injection(window, function() {
         instance = new OctoRef(adapter, config, window.location.pathname);
     }
 });
-
+setTimeout(() => {
+    console.log('>>> content script', window.ziga, window.adapter);
+}, 2000);
 syncer.getData('octoRef', ()=>null);
 syncer.subscribe('octoRef', ()=>null) //syncCallback
 

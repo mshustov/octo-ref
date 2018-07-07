@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener((request, sender, callback) => {
             const {line, character} = request.data.end;
 
             const result = server.getDefinition(url, line, character, content);
-            callback('from backgrounds');
+            callback(result);
             break;
 
         default:

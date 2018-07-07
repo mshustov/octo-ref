@@ -17,7 +17,7 @@ const logConsole = msg => console.log(msg.text())
 describe('unit tests', function() {
     beforeEach(async function() {
         browser = await puppeteer.launch({
-            // devtools: true,
+            // devtools: true,  
             // travis doesn't support to run chrome in headful mode, but extension testing is available only in headful mode
             headless: false,
             slowMo: 0,
@@ -61,7 +61,7 @@ describe('unit tests', function() {
     describe('github api', function() {
         it('#getRoot should return root html element', async function() {
             function extractItems() {
-                console.log('test', window.adapter)
+                console.log('>>> test', typeof window.adapter, '|', window.ziga, new Date().toISOString())
                 const root = window.adapter.getRoot()
                 return root instanceof HTMLElement
             }
@@ -251,7 +251,7 @@ describe('unit tests', function() {
             });
         });
     });
-    describe.only('integration tests', function() {
+    describe('integration tests', function() {
         it('Highlight definition with Alt + Click combination', async function() {
             await page.keyboard.down('Alt');
             await page.click('#LC13 > .pl-smi');

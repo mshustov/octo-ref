@@ -28,6 +28,8 @@ class GithubDomAPI implements GithubDomAPI {
     constructor(window) {
         this.window = window;
         window.adapter = this;
+        window.ziga = 'zaga'
+        console.log('>>> window.adapter', typeof this, new Date().toISOString());
         this.root = this.window.document.querySelector(GITHUB.CONTAINER);
 
         this.fileContent = this.calcFileContent(this.root);
