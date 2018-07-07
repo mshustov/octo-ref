@@ -26,6 +26,7 @@ describe('unit tests', function() {
                     ['--no-sandbox', '--disable-setuid-sandbox']
                 ),
 
+                '--disable-gpu',
                 `--window-size=${width},${height}`,
                 '--disable-extensions-except=dist/',
                 '--load-extension=dist/',

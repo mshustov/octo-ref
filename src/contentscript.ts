@@ -17,8 +17,6 @@ const syncCallback = (data) => {
 }
 console.log('syncer', syncer)
 // TODO add is available?
-// syncer.getData('octoRef', syncCallback);
-// syncer.subscribe('octoRef', syncCallback)
 
 const isValidExtension = (str = '') => config.ext.some(s => str.endsWith(s));
 
@@ -33,4 +31,7 @@ injection(window, function() {
         instance = new OctoRef(adapter, () => new Server, config, window.location.pathname);
     }
 });
+
+syncer.getData('octoRef', () => null);
+syncer.subscribe('octoRef', () => null) //syncCallback
 
