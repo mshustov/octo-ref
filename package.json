@@ -27,7 +27,9 @@
   },
   "scripts": {
     "build": "NODE_ENV=production webpack",
+    "build-tests": "webpack --config __tests__/webpack.config.js",
     "dev": "webpack --watch",
+    "pretest": "npm run build; npm run build-tests",
     "test": "jest"
   },
   "jest": {
@@ -37,7 +39,7 @@
         "tsConfigFile": "__tests__/tsconfig.jest.json"
       }
     },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
     "moduleFileExtensions": [
       "ts",
       "js",

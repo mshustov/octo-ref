@@ -1,4 +1,4 @@
-const GITHUB = {
+export const GITHUB = {
     CONTAINER: '.blob-wrapper tbody',
     FILENAME: '.js-permalink-shortcut',
     LINE: 'js-file-line',
@@ -27,9 +27,7 @@ class GithubDomAPI implements GithubDomAPI {
 
     constructor(window) {
         this.window = window;
-        window.adapter = this;
-        window.ziga = 'zaga'
-        console.log('>>> window.adapter', typeof this, new Date().toISOString());
+        // window.adapter = this;
         this.root = this.window.document.querySelector(GITHUB.CONTAINER);
 
         this.fileContent = this.calcFileContent(this.root);
@@ -241,4 +239,4 @@ class GithubDomAPI implements GithubDomAPI {
     }
 }
 
-export default GithubDomAPI;
+export default GithubDomAPI

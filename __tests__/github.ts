@@ -1,54 +1,52 @@
 import * as puppeteer from 'puppeteer';
-import * as fs from 'fs'
+import * as fs from 'fs';
+import * as path from 'path';
+import {GITHUB} from '../src/adapter/github'
+import config from '../src/config'
+
+const definitionClass = config.className.definition
+const referenceClass = config.className.reference
 
 const pageUrl = 'https://github.com/restrry/octo-ref/blob/master/tests/fixtures/github-page.js';
-// const scriptFile = fs.readFileSync('./dist/js/contentscript.js', 'utf8')
-let browser
-let page
 
 const width = 1400;
 const height = 1200;
 jest.setTimeout(1000000);
 
-const isCI = process.env.CI
-const isLocal = !isCI
-const logError = (err) => 'error on page: ' + err
+const isCI = Boolean(process.env.CI)
+const logError = err => console.error(err)
 const logConsole = msg => console.log(msg.text())
-describe('unit tests', function() {
+
+describe('e2e tests', function() {
+    let browser: puppeteer.Browser
+    let page: puppeteer.Page
     beforeEach(async function() {
         browser = await puppeteer.launch({
-            // devtools: true,  
+            devtools: !isCI,
             // travis doesn't support to run chrome in headful mode, but extension testing is available only in headful mode
             headless: false,
             slowMo: 0,
             args: [
-                // ...(isLocal ?
-                //     []:
-                //     []
-                // ),
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-gpu',
+                ...(isCI ? [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-gpu',
+                ] : []),
                 `--window-size=${width},${height}`,
+
                 '--disable-extensions-except=./dist/',
                 '--load-extension=./dist/',
-                '--user-agent=PuppeteerAgent'
             ]
         });
         page = await browser.newPage();
         page.on('error', logError);
         page.on('pageerror', logError);
         page.on('console', logConsole);
-        await page.setViewport({ width, height });
 
-        // we want to inject our script on the page, so we disable CSP
         await page.setBypassCSP(true);
         await page.goto(pageUrl);
-        // page.addScriptTag({
-        //     content: scriptFile
-        // });
-        // some artificial delay to wait for injected script to initialize
-        await page.waitFor(20000)
+        // some artificial delay to wait for extension to initialize
+        await page.waitFor(3000)
     });
 
     afterEach(() => {
@@ -58,232 +56,316 @@ describe('unit tests', function() {
         browser.close();
     });
 
-    describe('github api', function() {
-        it('#getRoot should return root html element', async function() {
-            function extractItems() {
-                console.log('>>> test', typeof window.adapter, '|', window.ziga, new Date().toISOString())
-                const root = window.adapter.getRoot()
-                return root instanceof HTMLElement
-            }
-            const rootIsInstanceOfHTML = await page.evaluate(extractItems)
-            expect(rootIsInstanceOfHTML).toBe(true);
-        })
+    it('Highlight definition with Alt + Click combination', async function() {
+        await page.keyboard.down('Alt');
+        await page.click('#LC13 > .pl-smi');
+        await page.keyboard.up('Alt');
 
-        it('#getFilename should resolve filename', async function() {
-            function getFilename() {
-                const filename = window.adapter.getFilename();
-                const fnBeginsAt = filename.lastIndexOf('/');
-                return filename.slice(fnBeginsAt)
-            }
+        await page.waitForSelector(`.${definitionClass}`);
 
-            const filename = await page.evaluate(getFilename)
-            expect(filename).toBe('/github-page.js');
-        })
+        function runner() {
+            const elem: HTMLElement = document.querySelector('#LC13 > .pl-smi');
+            return Array.from(elem.classList)
+        }
 
-        it('#getLineNumber should return line number', async function() {
-            function getLineNumber() {
-                const elem = window.document.getElementById('LC13').querySelector('.pl-smi'); // greet
-                const lineNumber = window.adapter.getLineNumber(elem);
-                return lineNumber
-            }
+        const classList = await page.evaluate(runner)
+        expect(classList).toContain(definitionClass)
+    });
 
-            const lineNumber = await page.evaluate(getLineNumber)
-            expect(lineNumber).toBe(13);
-        })
+    it('Highlight definition and references with Alt + Click combination', async function() {
+        await page.keyboard.down('Alt');
+        await page.click('#LC21 > .pl-smi');
+        await page.keyboard.up('Alt');
 
-        it.skip('#getElem should return the deepest selected element', async function() {
-            function getIsDeepestElementReturned() {
-                function setSelection(window, elem){
-                    const rng = window.document.createRange();
-                    rng.selectNode(elem)
-                    const sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(rng);
-                }
+        await page.waitForSelector(`.${definitionClass}`);
 
-                const elem = window.document.getElementById('LC13').querySelector('.pl-smi'); // greet
-                setSelection(window, elem);
-                debugger
-                const selectedElem = window.adapter.getElem(); // textNode, childNode of elem
+        function runner(definitionClass, referenceClass) {
+            const defElem: HTMLElement = document.querySelector(`#LC21 > .${definitionClass}`);
+            const refElem: HTMLElement = document.querySelector('#LC21 > .pl-smi');
 
-                return selectedElem === elem.childNodes[0]
-            }
+            return [
+                defElem && defElem !== refElem,
+                refElem.classList.contains(referenceClass)
+            ]
+        }
 
-            const isDeepestElementReturned = await page.evaluate(getIsDeepestElementReturned)
-            expect(isDeepestElementReturned).toBe(true);
-        })
+        const [definitionFound, referenceFound] = await page.evaluate(runner, definitionClass, referenceClass)
+        expect(definitionFound).toBe(true);
+        expect(referenceFound).toBe(true);
+    });
 
-        it('#getElemPosition should return object with position on element. shape {line, character}', async function() {
-            function getElemPosition() {
-                const elem = window.document.getElementById('LC13').querySelector('.pl-smi'); // greet
+    it('Wrap text node in span for highlighting purposes', async function() {
+        await page.keyboard.down('Alt');
+        await page.click('#LC21 > .pl-smi');
+        await page.keyboard.up('Alt');
 
-                const selectedElem = window.adapter.getElemPosition(elem);
-                return selectedElem
-            }
+        await page.waitForSelector(`.${definitionClass}`);
 
-            const elemPosition = await page.evaluate(getElemPosition)
-            expect(elemPosition).toEqual({ line: 13, character: 15 });
+        function runner(definitionClass, wrapperClass) {
+            const defElem: HTMLElement = document.querySelector(`#LC21 > .${definitionClass}`);
+
+            return defElem.classList.contains(wrapperClass)
+        }
+
+        const isWrapped = await page.evaluate(runner, definitionClass, GITHUB.WRAPPER)
+        expect(isWrapped).toBe(true);
+    });
+});
+
+const scriptFilePath = path.resolve(__dirname, 'dist/js/adapter.js')
+const scriptFile = fs.readFileSync(scriptFilePath, 'utf8')
+
+function setSelection(window: Window, elem: Node): void {
+    const rng = window.document.createRange();
+    rng.selectNode(elem)
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(rng);
+}
+
+function createAdapter (): GithubDomAPI {
+    const Adapter = window.adapter.default
+    return new Adapter(window)
+}
+
+describe('unit tests', function() {
+    let browser: puppeteer.Browser
+    let page: puppeteer.Page
+    beforeEach(async function() {
+        browser = await puppeteer.launch({
+            devtools: !isCI,
+            // travis doesn't support to run chrome in headful mode, but extension testing is available only in headful mode
+            headless: isCI,
+            slowMo: 0,
+            args: [
+                ...(isCI ? [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-gpu',
+                ] : []),
+                `--window-size=${width},${height}`
+            ]
+        });
+        page = await browser.newPage();
+        page.on('error', logError);
+        page.on('pageerror', logError);
+        page.on('console', logConsole);
+
+        // we want to inject our script on the page, so we disable CSP
+        await page.setBypassCSP(true);
+        await page.goto(pageUrl);
+
+        page.addScriptTag({
+            content: scriptFile
         });
 
-        it('#getEndColumnPosition should return end last position for element', async function() {
-            // TODO use one setSelection function
-            function getPositions() {
-                function setSelection(window, elem){
-                    const rng = window.document.createRange();
-                    rng.selectNode(elem)
-                    const sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(rng);
-                }
-        
-                const elem = window.document.getElementById('LC21').querySelector('.pl-c1'); // join
-                const charNumberWithoutSelection = window.adapter.getEndColumnPosition(elem);
-        
-                setSelection(window, elem);
-                const charNumberWithSelection = window.adapter.getEndColumnPosition(elem);
-                return {
-                    charNumberWithoutSelection,
-                    charNumberWithSelection
-                }
-            }
-
-            const positions = await page.evaluate(getPositions)
-            expect(positions).toEqual({
-                charNumberWithoutSelection: 19,
-                charNumberWithSelection: 27 // TODO check why 27, not 23
-            });
+        // add helpers
+        page.addScriptTag({
+            content: [
+                setSelection,
+                createAdapter
+            ].map(f => f.toString()).join(';')
         });
 
+        // some artificial delay to wait for injected script to initialize
+        await page.waitFor(3000)
+    });
 
-        it('#getElemLength should return length of elem content', async function() {
-            function getLength() {
-                const elem: HTMLElement = window.document.getElementById('LC21').querySelector('.pl-c1'); // join
-                const contentLengthForELEM_NODE = window.adapter.getElemLength(elem);
-                const contentLengthForTEXT_NODE = window.adapter.getElemLength(elem.nextSibling);
+    afterEach(() => {
+        page.removeListener('error', logError);
+        page.removeListener('pageerror', logError);
+        page.removeListener('console', logConsole);
+        browser.close();
+    });
 
-                return {
-                    contentLengthForELEM_NODE,
-                    contentLengthForTEXT_NODE
-                }
+    it('#getRoot should return root html element', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            const root = adapter.getRoot()
+            return root instanceof HTMLElement
+        }
+        const rootIsInstanceOfHTML = await page.evaluate(runner)
+        expect(rootIsInstanceOfHTML).toBe(true);
+    })
+
+    it('#getFilename should resolve filename', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            const filename = adapter.getFilename();
+            const fnBeginsAt = filename.lastIndexOf('/');
+            return filename.slice(fnBeginsAt)
+        }
+
+        const filename = await page.evaluate(runner)
+        expect(filename).toBe('/github-page.js');
+    })
+
+    it('#getLineNumber should return line number', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            const elem = window.document.getElementById('LC13').querySelector('.pl-smi'); // greet
+            const lineNumber = adapter.getLineNumber(elem);
+            return lineNumber
+        }
+
+        const lineNumber = await page.evaluate(runner)
+        expect(lineNumber).toBe(13);
+    })
+
+    it.skip('#getElem should return the deepest selected element', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            const elem = window.document.getElementById('LC13').querySelector('.pl-smi'); // greet
+            window.setSelection(window, elem);
+            const selectedElem = adapter.getElem(); // textNode, childNode of elem
+
+            return selectedElem === elem.childNodes[0]
+        }
+
+        const isDeepestElementReturned = await page.evaluate(runner)
+        expect(isDeepestElementReturned).toBe(true);
+    })
+
+    it('#getElemPosition should return object with position on element. shape {line, character}', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            const elem = window.document.getElementById('LC13').querySelector('.pl-smi'); // greet
+            const selectedElem = adapter.getElemPosition(elem);
+            return selectedElem
+        }
+
+        const elemPosition = await page.evaluate(runner)
+        expect(elemPosition).toEqual({ line: 13, character: 15 });
+    });
+
+    it('#getEndColumnPosition should return end last position for element', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            const elem = window.document.getElementById('LC21').querySelector('.pl-c1'); // join
+            const charNumberWithoutSelection = adapter.getEndColumnPosition(elem);
+
+            window.setSelection(window, elem);
+            const charNumberWithSelection = adapter.getEndColumnPosition(elem);
+            return {
+                charNumberWithoutSelection,
+                charNumberWithSelection
             }
-
-            const lengths = await page.evaluate(getLength)
-            expect(lengths).toEqual({
-                contentLengthForELEM_NODE: 4, // 'null'
-                contentLengthForTEXT_NODE: 11 // ', options);'
-            });
-        });
-        it('#subscribe/#unsubscribe should subscribe/unsubscribe on event ', async function() {
-            function getCalledCounter() {
-                let counter = 0
-                const callback = () => counter++
-                const elem = window.document.getElementById('LC17').querySelector('.pl-c1') as HTMLElement;
-        
-                window.adapter.subscribe('click', callback);
-                elem.click();
-        
-                window.adapter.unsubscribe('click', callback);
-                elem.click();
-                return counter
-            }
-
-            const calledCounter = await page.evaluate(getCalledCounter)
-            expect(calledCounter).toBe(1);
-        });
-        it('#show should add class name (wrap text node)', async function() {
-            function getNodes() {
-                const refsTextNode = {
-                    kind: 'writternReference',
-                    start: {character: 4, line: 2} as Location, // hello
-                    length: 5
-                };
-                const optionsTextNode = {className: 'test-classname1'};
-        
-                window.adapter.highlight(refsTextNode, optionsTextNode);
-                const selectedTextNode = window.document.querySelector('.test-classname1') as HTMLElement;
-                const textTextNode = selectedTextNode.innerText
-                // assert.equal(selectedElem.innerText, 'hello', 'wrap textNode');
-
-                const refsElemNode = {
-                    kind: 'writternReference',
-                    start: {character: 8, line: 21} as Location, // greet
-                    length: 5
-                }
-                const optionsElemNode = {className: 'test-classname2'};
-                window.adapter.highlight(refsElemNode, optionsElemNode);
-                const selectedElemNode = window.document.querySelector('.test-classname2') as HTMLElement;
-                const textElemNode = selectedElemNode.innerText
-                // assert.equal(selectedElemNode.innerText, 'greet', 'add className to element node');
-                return {
-                    textTextNode,
-                    textElemNode
-                }
-            }
-
-            const nodes = await page.evaluate(getNodes)
-            expect(nodes).toEqual({
-                textTextNode: 'hello',
-                textElemNode: 'greet'
-            });
-        });
-
-        it('#clean should remove all class names', async function() {
-            function checkClean() {
-                const refs = {
-                    kind: 'writternReference',
-                    start: {character: 4, line: 1} as Location, // hello
-                    length: 5
-                };
-                const options = {className: 'test-classname1'};
-                window.adapter.highlight(refs, options);
-                const beforeClean = window.document.getElementsByClassName('test-classname1').length;
-                // assert.equal(elems.length, 1, 'add class name');
-                window.adapter.clean(['test-classname1'])
-                const afterClean = window.document.getElementsByClassName('test-classname1').length;
-                // assert.equal(elems.length, 0, 'remove class name');
-                return {beforeClean, afterClean}
-            }
-
-            const cleanResult = await page.evaluate(checkClean)
-            expect(cleanResult).toEqual({
-                beforeClean: 1,
-                afterClean: 0
-            });
+        }
+        const positions = await page.evaluate(runner)
+        expect(positions).toEqual({
+            charNumberWithoutSelection: 19,
+            charNumberWithSelection: 27 // TODO check why 27, not 23
         });
     });
-    describe('integration tests', function() {
-        it('Highlight definition with Alt + Click combination', async function() {
-            await page.keyboard.down('Alt');
-            await page.click('#LC13 > .pl-smi');
-            await page.keyboard.up('Alt');
-            await page.waitFor(5000)
-            function extractItems() {
-                debugger
-                const elem: HTMLElement = document.querySelector('#LC13 > .pl-smi');
-                return elem.classList.contains('defColor')
+
+    it('#getElemLength should return length of elem content', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            const elem: HTMLElement = window.document.getElementById('LC21').querySelector('.pl-c1'); // join
+            const contentLengthForELEM_NODE = adapter.getElemLength(elem);
+            const contentLengthForTEXT_NODE = adapter.getElemLength(elem.nextSibling);
+
+            return {
+                contentLengthForELEM_NODE,
+                contentLengthForTEXT_NODE
             }
+        }
 
-            const definitionIsFound = await page.evaluate(extractItems)
-            expect(definitionIsFound).toBe(true);
+        const lengths = await page.evaluate(runner)
+        expect(lengths).toEqual({
+            contentLengthForELEM_NODE: 4, // 'null'
+            contentLengthForTEXT_NODE: 11 // ', options);'
         });
-        it('Highlight definition and references with Alt + Click combination', async function() {
-            await page.keyboard.down('Alt');
-            await page.click('#LC21 > .pl-smi');
-            await page.keyboard.up('Alt');
-            await page.waitFor(5000)
-            function extractItems() {
-                const defElem: HTMLElement = document.querySelector('#LC21 > .defColor');
-                const refElem: HTMLElement = document.querySelector('#LC21 > .pl-smi');
+    });
 
-                return [
-                    defElem && defElem !== refElem,
-                    refElem.classList.contains('refColor')
-                ]
+    it('#subscribe/#unsubscribe should subscribe/unsubscribe on event ', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            let counter = 0
+            const callback = () => counter++
+            const elem = window.document.getElementById('LC17').querySelector('.pl-c1') as HTMLElement;
+    
+            adapter.subscribe('click', callback);
+            elem.click();
+    
+            adapter.unsubscribe('click', callback);
+            elem.click();
+            return counter
+        }
+
+        const calledCounter = await page.evaluate(runner)
+        expect(calledCounter).toBe(1);
+    });
+
+    it('#show should add class name (wrap text node)', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            const refsTextNode = {
+                kind: 'writtenReference',
+                start: {character: 4, line: 2} as Location, // hello
+                length: 5
+            };
+            const optionsTextNode = {className: 'test-classname1'};
+    
+            adapter.highlight(refsTextNode, optionsTextNode);
+            const selectedTextNode = window.document.querySelector('.test-classname1') as HTMLElement;
+            const textTextNode = selectedTextNode.innerText
+
+            const refsElemNode = {
+                kind: 'writtenReference',
+                start: {character: 8, line: 21} as Location, // greet
+                length: 5
             }
+            const optionsElemNode = {className: 'test-classname2'};
+            adapter.highlight(refsElemNode, optionsElemNode);
+            const selectedElemNode = window.document.querySelector('.test-classname2') as HTMLElement;
+            const textElemNode = selectedElemNode.innerText
 
-            const [definitionFound, referenceFound] = await page.evaluate(extractItems)
-            expect(definitionFound).toBe(true);
-            expect(referenceFound).toBe(true);
+            return {
+                textTextNode,
+                textElemNode
+            }
+        }
+
+        const nodes = await page.evaluate(runner)
+        expect(nodes).toEqual({
+            textTextNode: 'hello',
+            textElemNode: 'greet'
         });
-    })
+    });
+
+    it('#clean should remove all class names', async function() {
+        function runner() {
+            const adapter = window.createAdapter()
+
+            const refs = {
+                kind: 'writternReference',
+                start: {character: 4, line: 1} as Location, // hello
+                length: 5
+            };
+            const options = {className: 'test-classname1'};
+            adapter.highlight(refs, options);
+            const beforeClean = window.document.getElementsByClassName('test-classname1').length;
+
+            adapter.clean(['test-classname1'])
+            const afterClean = window.document.getElementsByClassName('test-classname1').length;
+
+            return {beforeClean, afterClean}
+        }
+
+        const cleanResult = await page.evaluate(runner)
+        expect(cleanResult).toEqual({
+            beforeClean: 1,
+            afterClean: 0
+        });
+    });
 });

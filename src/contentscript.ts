@@ -25,13 +25,11 @@ injection(window, function() {
         if(instance){
             instance.removeHandlers();
         }
-        const adapter = new Adapter(window);
+        const adapter = new Adapter(window)
         instance = new OctoRef(adapter, config, window.location.pathname);
     }
 });
-setTimeout(() => {
-    console.log('>>> content script', window.ziga, window.adapter);
-}, 2000);
+
 syncer.getData('octoRef', ()=>null);
 syncer.subscribe('octoRef', ()=>null) //syncCallback
 
