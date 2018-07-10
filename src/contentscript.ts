@@ -4,7 +4,6 @@ import Styler from './lib/update-style';
 import template from './lib/template';
 import syncer from './lib/sync-storage';
 import Adapter from './adapter/github';
-// import Server from './lib/server';
 import config from './config';
 
 const styler = new Styler(template);
@@ -30,6 +29,5 @@ injection(window, function() {
     }
 });
 
-syncer.getData('octoRef', ()=>null);
-syncer.subscribe('octoRef', ()=>null) //syncCallback
-
+syncer.getData('octoRef', syncCallback);
+syncer.subscribe('octoRef', syncCallback)

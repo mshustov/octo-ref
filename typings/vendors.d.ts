@@ -12,8 +12,6 @@ declare module "object-assign" {
     export = assign
 }
 
-declare function require(string): any;
-
 declare interface ActionsToDo {
     highlightOnly: boolean,
     jumpToNextUsage: boolean,

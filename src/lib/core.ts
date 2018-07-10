@@ -8,7 +8,6 @@ class OctoRef {
         return item.kind === 'writtenReference';
     }
 
-    // TODO  make server lazy?
     constructor(adapter, config, url){
         this.domAPI = adapter;
         if(this.domAPI.isCodePage()){
@@ -73,12 +72,7 @@ class OctoRef {
     findDefinition(actionToDo = {}){
         const position = this.domAPI.getSelectedElemPosition();
         const url = this.url;
-        const content = this.domAPI.getFileContent()
-        const {line, character} = position;
 
-        // const response = this.server.getDefinition(url, line, character, content);
-
-        // this.highlight(actionToDo, response, position);
         this.send('definition',
             {
                 end: position,

@@ -43,6 +43,7 @@ describe('e2e tests', function() {
         page.on('pageerror', logError);
         page.on('console', logConsole);
 
+        await page.setViewport({ width, height });
         await page.setBypassCSP(true);
         await page.goto(pageUrl);
         // some artificial delay to wait for extension to initialize
@@ -151,6 +152,7 @@ describe('unit tests', function() {
         page.on('pageerror', logError);
         page.on('console', logConsole);
 
+        await page.setViewport({ width, height });
         // we want to inject our script on the page, so we disable CSP
         await page.setBypassCSP(true);
         await page.goto(pageUrl);
@@ -247,11 +249,12 @@ describe('unit tests', function() {
         function runner() {
             const adapter = window.createAdapter()
 
-            const elem = window.document.getElementById('LC21').querySelector('.pl-c1'); // join
+            const elem = window.document.getElementById('LC13').querySelector('.pl-en'); // greet
             const charNumberWithoutSelection = adapter.getEndColumnPosition(elem);
 
             window.setSelection(window, elem);
             const charNumberWithSelection = adapter.getEndColumnPosition(elem);
+
             return {
                 charNumberWithoutSelection,
                 charNumberWithSelection
@@ -259,8 +262,8 @@ describe('unit tests', function() {
         }
         const positions = await page.evaluate(runner)
         expect(positions).toEqual({
-            charNumberWithoutSelection: 19,
-            charNumberWithSelection: 27 // TODO check why 27, not 23
+            charNumberWithoutSelection: 9,
+            charNumberWithSelection: 12
         });
     });
 
