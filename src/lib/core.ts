@@ -1,6 +1,5 @@
 import { controls, keyCode } from './utils';
-
-class OctoRef{
+class OctoRef {
     url: string
     domAPI: GithubDomAPI
     config: any
@@ -42,10 +41,11 @@ class OctoRef{
     }
 
     getDesiredActions(e){
+        // TODO create as a type to test in tests for example
         return {
-            highlightOnly: e[controls.highlight.value],
-            jumpToNextUsage: e[controls.jump.value] && !e[controls.highlight.value],
-            jumpToDefinition: e[controls.jump.value] && e[controls.highlight.value]
+            highlightOnly: Boolean(e[controls.highlight.value]),
+            jumpToNextUsage: Boolean(e[controls.jump.value] && !e[controls.highlight.value]),
+            jumpToDefinition: Boolean(e[controls.jump.value] && e[controls.highlight.value])
         }
     }
 
@@ -72,6 +72,7 @@ class OctoRef{
     findDefinition(actionToDo = {}){
         const position = this.domAPI.getSelectedElemPosition();
         const url = this.url;
+
         this.send('definition',
             {
                 end: position,
@@ -87,7 +88,6 @@ class OctoRef{
     }
 
     send(cmd, data, cb){
-        // CHECKME: we should add extensionId, when we get it)
         chrome.runtime.sendMessage({ cmd, data }, cb);
     }
 
@@ -99,8 +99,8 @@ class OctoRef{
         }));
 
         data.forEach((highlight) => {
-            const isForDefiniton = OctoRef.isDefinition(highlight);
-            const className = this.config.getClassName(isForDefiniton);
+            const isForDefinition = OctoRef.isDefinition(highlight);
+            const className = this.config.getClassName(isForDefinition);
 
             this.domAPI.highlight( highlight, { className });
         })

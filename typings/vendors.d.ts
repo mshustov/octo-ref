@@ -12,8 +12,6 @@ declare module "object-assign" {
     export = assign
 }
 
-declare function require(string): any;
-
 declare interface ActionsToDo {
     highlightOnly: boolean,
     jumpToNextUsage: boolean,
@@ -89,7 +87,7 @@ declare interface Server {
     // ls: typescript.LanguageService
     addFile(filename: string, content: string): void
     removeFile(filename: string): void
-    getDefinition(filename: string, line: number, col: number): Highlight[]
+    getDefinition(filename: string, line: number, col: number, content: string): Highlight[]
 }
 
 declare interface GithubDomAPI {
@@ -107,15 +105,15 @@ declare interface GithubDomAPI {
     clean(selectors: string[]): void
     getSelectedElemPosition():Location
 
-    getElem(): HTMLElement
-    getElemLength(elem: HTMLElement): number
-    getElemPosition (elem: HTMLElement): Location
-    getLineNumber(elem: HTMLElement): number
-    getEndColumnPosition(elem: HTMLElement): number
+    getElem(): Element
+    getElemLength(elem: Node): number
+    getElemPosition (elem: Element): Location
+    getLineNumber(elem: Element): number
+    getEndColumnPosition(elem: Element): number
 
-    _iterateUnitlOffset(root: HTMLElement, endOffset: number): OffsetElem
-    _createDOMWrapper(className: string): HTMLElement
-    _createHighlightDOMWrapper(elem: HTMLElement, position: Location, className: string): void
+    _iterateUnitlOffset(root: Element, endOffset: number): OffsetElem
+    _createDOMWrapper(className: string): Element
+    _createHighlightDOMWrapper(elem: Element, position: Location, className: string): void
     _getDOMMappring(data: Highlight): OffsetElem
     highlight(data: Highlight, {className: string}): void
     jumpToDefinition(data: Highlight): void

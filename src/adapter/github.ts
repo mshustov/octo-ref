@@ -1,4 +1,4 @@
-const GITHUB = {
+export const GITHUB = {
     CONTAINER: '.blob-wrapper tbody',
     FILENAME: '.js-permalink-shortcut',
     LINE: 'js-file-line',
@@ -27,6 +27,7 @@ class GithubDomAPI implements GithubDomAPI {
 
     constructor(window) {
         this.window = window;
+        // window.adapter = this;
         this.root = this.window.document.querySelector(GITHUB.CONTAINER);
 
         this.fileContent = this.calcFileContent(this.root);
@@ -189,11 +190,10 @@ class GithubDomAPI implements GithubDomAPI {
     highlight(data, options){
         const { elem, offset } = this._getDOMMappring(data);
         const { className } = options;
-
         switch(elem.nodeType){
             case NODE.ELEMENT:
                 // chrome doesn't support mulitple select
-                // proboably when it does, we should switch to selectNode
+                // probably when it does, we should switch to selectNode
                 // google: Discontiguous selection is not supported.
                 elem.classList.add(className);
                 break;
@@ -239,4 +239,4 @@ class GithubDomAPI implements GithubDomAPI {
     }
 }
 
-export default GithubDomAPI;
+export default GithubDomAPI

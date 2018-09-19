@@ -66,6 +66,8 @@ class Server{
                     length: textSpan.length
                 }
             });
+        }catch(e){
+            console.log('getDefinition error', e);
         } finally {
             this.filecache.removeFile(filename);
         }

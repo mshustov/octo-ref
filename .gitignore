@@ -1,3 +1,4 @@
 dist/js/
 links/
 tests/fixtures/*.html
+__tests__/dist/

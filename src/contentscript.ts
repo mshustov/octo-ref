@@ -15,9 +15,6 @@ const syncCallback = (data) => {
     styler.updateStyle({refColor, defColor});
 }
 
-syncer.getData('octoRef', syncCallback);
-syncer.subscribe('octoRef', syncCallback)
-
 const isValidExtension = (str = '') => config.ext.some(s => str.endsWith(s));
 
 let instance;
@@ -27,8 +24,10 @@ injection(window, function() {
         if(instance){
             instance.removeHandlers();
         }
-        const adapter = new Adapter(window);
+        const adapter = new Adapter(window)
         instance = new OctoRef(adapter, config, window.location.pathname);
     }
 });
 
+syncer.getData('octoRef', syncCallback);
+syncer.subscribe('octoRef', syncCallback)
