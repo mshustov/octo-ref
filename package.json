@@ -36,7 +36,7 @@
     "verbose": true,
     "globals": {
       "ts-jest": {
-        "tsConfigFile": "__tests__/tsconfig.jest.json"
+        "tsConfigFile": "tsconfig.jest.json"
       }
     },
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$",
