@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {GITHUB} from '../src/adapter/github'
 import config from '../src/config'
+import getInlinedHelpers from '../utils/helpers'
 
 const definitionClass = config.className.definition
 const referenceClass = config.className.reference
@@ -11,6 +12,9 @@ const pageUrl = 'https://github.com/restrry/octo-ref/blob/master/tests/fixtures/
 
 const width = 1400;
 const height = 1200;
+const SECOND = 1000;
+const scriptInitializationDelay = 3 * SECOND
+
 jest.setTimeout(1000000);
 
 const isCI = Boolean(process.env.CI)
@@ -46,8 +50,8 @@ describe('e2e tests', function() {
         await page.setViewport({ width, height });
         await page.setBypassCSP(true);
         await page.goto(pageUrl);
-        // some artificial delay to wait for extension to initialize
-        await page.waitFor(3000)
+
+        await page.waitFor(scriptInitializationDelay)
     });
 
     afterEach(() => {
@@ -64,13 +68,16 @@ describe('e2e tests', function() {
 
         await page.waitForSelector(`.${definitionClass}`);
 
-        function runner() {
+        function runner(definitionClass) {
             const elem: HTMLElement = document.querySelector('#LC13 > .pl-smi');
-            return Array.from(elem.classList)
+            // return Array.from(elem.classList)
+            return {
+                isContainDefinitionClass: Array.from(elem.classList).includes(definitionClass)
+            }
         }
 
-        const classList = await page.evaluate(runner)
-        expect(classList).toContain(definitionClass)
+        const {isContainDefinitionClass} = await page.evaluate(runner, definitionClass)
+        expect(isContainDefinitionClass).toBe(true)
     });
 
     it('Highlight definition and references with Alt + Click combination', async function() {
@@ -84,15 +91,15 @@ describe('e2e tests', function() {
             const defElem: HTMLElement = document.querySelector(`#LC21 > .${definitionClass}`);
             const refElem: HTMLElement = document.querySelector('#LC21 > .pl-smi');
 
-            return [
-                defElem && defElem !== refElem,
-                refElem.classList.contains(referenceClass)
-            ]
+            return {
+                isDefinitionFound: defElem && defElem !== refElem,
+                isReferenceFound: refElem.classList.contains(referenceClass)
+            }
         }
 
-        const [definitionFound, referenceFound] = await page.evaluate(runner, definitionClass, referenceClass)
-        expect(definitionFound).toBe(true);
-        expect(referenceFound).toBe(true);
+        const {isDefinitionFound, isReferenceFound} = await page.evaluate(runner, definitionClass, referenceClass);
+        expect(isDefinitionFound).toBe(true);
+        expect(isReferenceFound).toBe(true);
     });
 
     it('Wrap text node in span for highlighting purposes', async function() {
@@ -105,29 +112,18 @@ describe('e2e tests', function() {
         function runner(definitionClass, wrapperClass) {
             const defElem: HTMLElement = document.querySelector(`#LC21 > .${definitionClass}`);
 
-            return defElem.classList.contains(wrapperClass)
+            return {
+                isWrapped: defElem.classList.contains(wrapperClass)
+            }
         }
 
-        const isWrapped = await page.evaluate(runner, definitionClass, GITHUB.WRAPPER)
+        const {isWrapped} = await page.evaluate(runner, definitionClass, GITHUB.WRAPPER)
         expect(isWrapped).toBe(true);
     });
 });
 
 const scriptFilePath = path.resolve(__dirname, 'dist/js/adapter.js')
 const scriptFile = fs.readFileSync(scriptFilePath, 'utf8')
-
-function setSelection(window: Window, elem: Node): void {
-    const rng = window.document.createRange();
-    rng.selectNode(elem)
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(rng);
-}
-
-function createAdapter (): GithubDomAPI {
-    const Adapter = window.adapter.default
-    return new Adapter(window)
-}
 
 describe('unit tests', function() {
     let browser: puppeteer.Browser
@@ -163,14 +159,10 @@ describe('unit tests', function() {
 
         // add helpers
         page.addScriptTag({
-            content: [
-                setSelection,
-                createAdapter
-            ].map(f => f.toString()).join(';')
+            content: getInlinedHelpers()
         });
 
-        // some artificial delay to wait for injected script to initialize
-        await page.waitFor(3000)
+        await page.waitFor(scriptInitializationDelay)
     });
 
     afterEach(() => {
@@ -185,9 +177,11 @@ describe('unit tests', function() {
             const adapter = window.createAdapter()
 
             const root = adapter.getRoot()
-            return root instanceof HTMLElement
+            return {
+                rootIsInstanceOfHTML: root instanceof HTMLElement
+            }
         }
-        const rootIsInstanceOfHTML = await page.evaluate(runner)
+        const {rootIsInstanceOfHTML} = await page.evaluate(runner)
         expect(rootIsInstanceOfHTML).toBe(true);
     })
 
@@ -225,10 +219,12 @@ describe('unit tests', function() {
             window.setSelection(window, elem);
             const selectedElem = adapter.getElem(); // textNode, childNode of elem
 
-            return selectedElem === elem.childNodes[0]
+            return {
+                isDeepestElementReturned: selectedElem === elem.childNodes[0]
+            }
         }
 
-        const isDeepestElementReturned = await page.evaluate(runner)
+        const {isDeepestElementReturned} = await page.evaluate(runner)
         expect(isDeepestElementReturned).toBe(true);
     })
 
