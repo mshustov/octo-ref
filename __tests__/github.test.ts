@@ -21,7 +21,7 @@ const isCI = Boolean(process.env.CI)
 const logError = err => console.error(err)
 const logConsole = msg => console.log(msg.text())
 
-describe.skip('e2e tests', function() {
+describe('e2e tests', function() {
     let browser: puppeteer.Browser
     let page: puppeteer.Page
     beforeEach(async function() {
