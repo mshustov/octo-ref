@@ -8,7 +8,7 @@ import getInlinedHelpers from '../utils/helpers'
 const definitionClass = config.className.definition
 const referenceClass = config.className.reference
 
-const pageUrl = 'https://github.com/restrry/octo-ref/blob/master/tests/fixtures/github-page.js';
+const pageUrl = 'https://github.com/restrry/octo-ref/blob/master/fixtures/github-page.js';
 
 const width = 1400;
 const height = 1200;
