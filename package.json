@@ -7,7 +7,7 @@
     "react": "^0.14.7",
     "react-color": "^2.0.0",
     "react-dom": "^0.14.7",
-    "typescript": "2.9.2",
+    "typescript": "3.0.3",
     "webpack-cli": "^3.0.8"
   },
   "devDependencies": {
@@ -22,7 +22,7 @@
     "json-loader": "^0.5.7",
     "puppeteer": "1.6.2",
     "ts-jest": "^23.0.0",
-    "ts-loader": "4.4.2",
+    "ts-loader": "5.2.0",
     "webpack": "^4.14.0"
   },
   "scripts": {
